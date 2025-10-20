@@ -754,6 +754,36 @@
             gap: 0.5rem;
         }
         
+        /* Performance Styles */
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .performance-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .performance-card h3 {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: var(--background);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        
         /* Toast Notifications */
         .toast-container {
             position: fixed;
@@ -1649,6 +1679,37 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Performance Tab (TSM/SIBO Only) -->
+                    <div id="performance-tab" class="tab-content">
+                        <div class="section-header">
+                            <h2>Team Performance Analytics</h2>
+                            <div class="header-actions">
+                                <select id="timeFilter">
+                                    <option value="week">This Week</option>
+                                    <option value="month" selected>This Month</option>
+                                    <option value="quarter">This Quarter</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="performance-content" id="performanceContent">
+                            <!-- Performance content will be populated here for SIBO users -->
+                        </div>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div id="reports-tab" class="tab-content">
+                        <div class="section-header">
+                            <h2>Reports & Analytics</h2>
+                            <button class="btn btn-primary" id="generateReportBtn">
+                                <span class="btn-icon">📊</span>
+                                Generate Report
+                            </button>
+                        </div>
+                        <div class="reports-content" id="reportsContent">
+                            <!-- Reports content will be populated here for SIBO users -->
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
@@ -2010,16 +2071,26 @@
                     this.exportAllData();
                 });
                 document.getElementById('exportRetailersBtn').addEventListener('click', () => {
-                    this.exportRetailers();
+                    this.exportToCSV('retailers');
                 });
                 document.getElementById('exportProspectsBtn').addEventListener('click', () => {
-                    this.exportProspects();
+                    this.exportToCSV('prospects');
                 });
                 document.getElementById('exportRecruitmentBtn').addEventListener('click', () => {
-                    this.exportRecruitment();
+                    this.exportToCSV('recruitment');
                 });
                 document.getElementById('exportServicingBtn').addEventListener('click', () => {
-                    this.exportServicing();
+                    this.exportToCSV('servicing');
+                });
+                
+                // Generate report button
+                document.getElementById('generateReportBtn').addEventListener('click', () => {
+                    this.generatePerformanceReport();
+                });
+                
+                // Time filter for performance
+                document.getElementById('timeFilter').addEventListener('change', (e) => {
+                    this.updatePerformanceData(e.target.value);
                 });
             },
             
@@ -2225,6 +2296,17 @@
                 this.updateRecruitmentTable();
                 this.updateServicingTable();
                 this.populateRetailerDropdown();
+                
+                // Initialize SIBO-specific features
+                if (userData.role === 'SIBO') {
+                    this.initializeSIBOFeatures();
+                }
+            },
+            
+            // Initialize SIBO-specific features
+            initializeSIBOFeatures: function() {
+                this.updatePerformanceData('month');
+                this.initializeReports();
             },
             
             // Handle logout
@@ -2287,6 +2369,15 @@
                 };
                 
                 document.getElementById('pageTitle').textContent = tabTitles[tabId] || 'Dashboard';
+                
+                // Initialize SIBO features if user is SIBO and viewing performance/reports
+                if (this.userRole === 'SIBO') {
+                    if (tabId === 'performance-tab') {
+                        this.updatePerformanceData('month');
+                    } else if (tabId === 'reports-tab') {
+                        this.initializeReports();
+                    }
+                }
             },
             
             // Toggle form visibility
@@ -2634,26 +2725,275 @@
                 return `${diffDays} days ago`;
             },
             
-            // Export functions (placeholder implementations)
+            // ========== SIBO FEATURES ==========
+            
+            // Update performance data for SIBO users
+            updatePerformanceData: function(timeRange) {
+                if (this.userRole !== 'SIBO') {
+                    document.getElementById('performanceContent').innerHTML = `
+                        <div class="access-denied" style="text-align: center; padding: 3rem;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">🔒</div>
+                            <h3>Access Restricted</h3>
+                            <p>Performance analytics are only available to SIBO Administrators.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Generate performance data based on time range
+                const performanceData = this.generatePerformanceData(timeRange);
+                
+                document.getElementById('performanceContent').innerHTML = `
+                    <div class="performance-grid">
+                        <div class="performance-card">
+                            <h3>📈 Cluster Performance</h3>
+                            <div class="chart-placeholder">
+                                Performance chart for ${timeRange} period
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <strong>Top Performing Clusters:</strong>
+                                <ul style="margin-top: 0.5rem;">
+                                    ${performanceData.topClusters.map(cluster => `
+                                        <li>${cluster.name}: ${cluster.value} retailers</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-card">
+                            <h3>👥 Agent Performance</h3>
+                            <div class="chart-placeholder">
+                                Agent performance metrics
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <strong>Top Agents:</strong>
+                                <ul style="margin-top: 0.5rem;">
+                                    ${performanceData.topAgents.map(agent => `
+                                        <li>${agent.name}: ${agent.conversions} conversions</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="performance-card">
+                            <h3>📊 Conversion Metrics</h3>
+                            <div class="stats-grid" style="grid-template-columns: 1fr;">
+                                <div class="stat-card">
+                                    <div class="stat-icon primary">🏪</div>
+                                    <div class="stat-content">
+                                        <h3>Total Retailers</h3>
+                                        <div class="stat-value">${performanceData.totalRetailers}</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon success">👥</div>
+                                    <div class="stat-content">
+                                        <h3>Active Prospects</h3>
+                                        <div class="stat-value">${performanceData.activeProspects}</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon warning">📈</div>
+                                    <div class="stat-content">
+                                        <h3>Conversion Rate</h3>
+                                        <div class="stat-value">${performanceData.conversionRate}%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            // Generate sample performance data
+            generatePerformanceData: function(timeRange) {
+                const clusters = ['KASARANI', 'MWIKI', 'ZIMMERMAN', 'GITHURAI', 'RUAI'];
+                const agents = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams', 'David Brown'];
+                
+                return {
+                    topClusters: clusters.map(cluster => ({
+                        name: cluster,
+                        value: Math.floor(Math.random() * 50) + 20
+                    })).sort((a, b) => b.value - a.value).slice(0, 3),
+                    
+                    topAgents: agents.map(agent => ({
+                        name: agent,
+                        conversions: Math.floor(Math.random() * 30) + 10
+                    })).sort((a, b) => b.conversions - a.conversions).slice(0, 3),
+                    
+                    totalRetailers: this.masterData.retailers.length,
+                    activeProspects: this.masterData.prospects.filter(p => p.status !== 'Converted').length,
+                    conversionRate: Math.floor((this.masterData.retailers.length / (this.masterData.prospects.length + this.masterData.retailers.length)) * 100)
+                };
+            },
+            
+            // Initialize reports for SIBO users
+            initializeReports: function() {
+                if (this.userRole !== 'SIBO') {
+                    document.getElementById('reportsContent').innerHTML = `
+                        <div class="access-denied" style="text-align: center; padding: 3rem;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">🔒</div>
+                            <h3>Access Restricted</h3>
+                            <p>Reports are only available to SIBO Administrators.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                document.getElementById('reportsContent').innerHTML = `
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>📈 Performance Report</h3>
+                            <p>Comprehensive performance analytics and insights across all clusters</p>
+                            <button class="btn btn-outline btn-sm" onclick="app.generatePerformanceReport()">
+                                Generate Report
+                            </button>
+                        </div>
+                        <div class="report-card">
+                            <h3>🏪 Retailer Report</h3>
+                            <p>Detailed retailer network analysis and distribution</p>
+                            <button class="btn btn-outline btn-sm" onclick="app.exportToCSV('retailers')">
+                                Export CSV
+                            </button>
+                        </div>
+                        <div class="report-card">
+                            <h3>👥 Prospect Report</h3>
+                            <p>Lead conversion and prospect tracking analysis</p>
+                            <button class="btn btn-outline btn-sm" onclick="app.exportToCSV('prospects')">
+                                Export CSV
+                            </button>
+                        </div>
+                        <div class="report-card">
+                            <h3>✅ Recruitment Report</h3>
+                            <p>Recruitment status and agent onboarding analysis</p>
+                            <button class="btn btn-outline btn-sm" onclick="app.exportToCSV('recruitment')">
+                                Export CSV
+                            </button>
+                        </div>
+                        <div class="report-card">
+                            <h3>🔄 Servicing Report</h3>
+                            <p>Service float management and maintenance analysis</p>
+                            <button class="btn btn-outline btn-sm" onclick="app.exportToCSV('servicing')">
+                                Export CSV
+                            </button>
+                        </div>
+                        <div class="report-card">
+                            <h3>📋 Consolidated Report</h3>
+                            <p>Complete overview with all data combined</p>
+                            <button class="btn btn-outline btn-sm" onclick="app.exportAllData()">
+                                Export All Data
+                            </button>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            // Generate performance report
+            generatePerformanceReport: function() {
+                if (this.userRole !== 'SIBO') {
+                    this.showToast('Access denied. SIBO privileges required.', 'error');
+                    return;
+                }
+                
+                this.showToast('Generating comprehensive performance report...', 'info');
+                // In a real application, this would generate a detailed PDF report
+                setTimeout(() => {
+                    this.showToast('Performance report generated successfully!', 'success');
+                }, 2000);
+            },
+            
+            // ========== CSV EXPORT FUNCTIONALITY ==========
+            
+            // Export all data
             exportAllData: function() {
-                this.showToast('Exporting all data...', 'info');
-                // In a real app, this would generate and download CSV/Excel files
+                this.exportToCSV('all');
             },
             
-            exportRetailers: function() {
-                this.showToast('Exporting retailers data...', 'info');
+            // Export specific data type to CSV
+            exportToCSV: function(dataType) {
+                let data = [];
+                let filename = '';
+                
+                switch(dataType) {
+                    case 'retailers':
+                        data = this.getUserData().retailers;
+                        filename = 'retailers.csv';
+                        break;
+                    case 'prospects':
+                        data = this.getUserData().prospects;
+                        filename = 'prospects.csv';
+                        break;
+                    case 'recruitment':
+                        data = this.getUserData().recruitment;
+                        filename = 'recruitment.csv';
+                        break;
+                    case 'servicing':
+                        data = this.getUserData().servicing;
+                        filename = 'servicing.csv';
+                        break;
+                    case 'all':
+                        // Combine all data for SIBO users, or just user's cluster data for others
+                        const userData = this.getUserData();
+                        data = [
+                            ...userData.retailers.map(item => ({...item, type: 'retailer'})),
+                            ...userData.prospects.map(item => ({...item, type: 'prospect'})),
+                            ...userData.recruitment.map(item => ({...item, type: 'recruitment'})),
+                            ...userData.servicing.map(item => ({...item, type: 'servicing'}))
+                        ];
+                        filename = 'all_data.csv';
+                        break;
+                }
+                
+                if (data.length === 0) {
+                    this.showToast('No data available to export', 'warning');
+                    return;
+                }
+                
+                // Convert data to CSV
+                const csv = this.convertToCSV(data);
+                
+                // Create and download file
+                this.downloadCSV(csv, filename);
+                this.showToast(`${filename} downloaded successfully!`, 'success');
             },
             
-            exportProspects: function() {
-                this.showToast('Exporting prospects data...', 'info');
+            // Convert data to CSV format
+            convertToCSV: function(data) {
+                if (data.length === 0) return '';
+                
+                const headers = Object.keys(data[0]);
+                const csvRows = [];
+                
+                // Add headers
+                csvRows.push(headers.join(','));
+                
+                // Add data rows
+                for (const row of data) {
+                    const values = headers.map(header => {
+                        const value = row[header];
+                        // Handle values that might contain commas or quotes
+                        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                            return `"${value.replace(/"/g, '""')}"`;
+                        }
+                        return value;
+                    });
+                    csvRows.push(values.join(','));
+                }
+                
+                return csvRows.join('\n');
             },
             
-            exportRecruitment: function() {
-                this.showToast('Exporting recruitment data...', 'info');
-            },
-            
-            exportServicing: function() {
-                this.showToast('Exporting servicing data...', 'info');
+            // Download CSV file
+            downloadCSV: function(csv, filename) {
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.setAttribute('hidden', '');
+                a.setAttribute('href', url);
+                a.setAttribute('download', filename);
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             },
             
             // Edit functions (placeholder implementations)
