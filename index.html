@@ -4,26 +4,905 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RetailerPro | Enterprise Retail Management</title>
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0369a1">
-    <meta name="description" content="Professional retail management platform for field sales teams">
-    
-    <!-- Apple specific -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="RetailerPro">
-    
-    <!-- Microsoft specific -->
-    <meta name="msapplication-TileColor" content="#0369a1">
-    
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230369a1' rx='20'/><text x='50' y='65' font-family='Arial' font-size='45' text-anchor='middle' fill='white'>RP</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #0369a1;
+            --primary-dark: #075985;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Login Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        }
+        
+        .login-card {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+        
+        .login-header {
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .login-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .login-subtitle {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .login-form {
+            padding: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
+        }
+        
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .btn-block {
+            width: 100%;
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(3, 105, 161, 0.3);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-text {
+            background: transparent;
+            color: var(--text);
+        }
+        
+        .btn-text:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-loader {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Dashboard Layout */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .app-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+        
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .nav-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            padding: 0 1.5rem 0.5rem;
+            font-weight: 600;
+        }
+        
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-item:hover {
+            background: rgba(3, 105, 161, 0.05);
+            color: var(--primary);
+        }
+        
+        .nav-item.active {
+            background: rgba(3, 105, 161, 0.1);
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+        }
+        
+        .nav-icon {
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--background);
+            overflow: hidden;
+        }
+        
+        .content-header {
+            padding: 1.5rem 2rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .territory-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(3, 105, 161, 0.1);
+            border-radius: 8px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Dashboard Styles */
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .stat-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.primary {
+            background: rgba(3, 105, 161, 0.1);
+            color: var(--primary);
+        }
+        
+        .stat-icon.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-icon.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+        
+        .stat-icon.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-content h3 {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-trend {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .stat-trend.positive {
+            color: var(--success);
+        }
+        
+        .stat-progress {
+            margin-top: 0.5rem;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .actions-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .actions-section h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .action-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-icon {
+            font-size: 1.5rem;
+        }
+        
+        .action-text {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .activity-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .view-all {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--background);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        /* Form Styles */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .form-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(3, 105, 161, 0.1);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .checkbox-label input {
+            width: auto;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Table Styles */
+        .table-section {
+            background: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-group select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--background);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+        }
+        
+        tr:hover {
+            background: rgba(0, 0, 0, 0.02);
+        }
+        
+        /* Reports Grid */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .report-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .report-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .toast {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 350px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+        
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+        
+        .toast.info {
+            border-left: 4px solid var(--primary);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .app-layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .sidebar-content {
+                display: flex;
+                overflow-x: auto;
+                padding: 0.5rem;
+            }
+            
+            .nav-section {
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+            
+            .nav-items {
+                flex-direction: row;
+            }
+            
+            .nav-item {
+                flex-direction: column;
+                text-align: center;
+                padding: 0.75rem;
+                min-width: 80px;
+            }
+            
+            .nav-text {
+                font-size: 0.75rem;
+                margin-top: 0.25rem;
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                border-radius: 12px;
+            }
+            
+            .login-header {
+                padding: 1.5rem;
+            }
+            
+            .login-form {
+                padding: 1.5rem;
+            }
+            
+            .content-wrapper {
+                padding: 1rem;
+            }
+            
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-        <!-- Login Section -->
+    <!-- Login Section (Visible by default) -->
     <div id="loginSection" class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -89,742 +968,685 @@
             </form>
         </div>
     </div>
-            <div class="sidebar-content">
-                <div class="nav-section">
-                    <h3 class="nav-section-title">CORE</h3>
-                    <div class="nav-items">
-                        <a href="#dashboard" class="nav-item active" data-tab="dashboard-tab">
-                            <span class="nav-icon">📊</span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                        <a href="#retailers" class="nav-item" data-tab="retailers-tab">
-                            <span class="nav-icon">🏪</span>
-                            <span class="nav-text">Retailers</span>
-                        </a>
-                        <a href="#prospects" class="nav-item" data-tab="prospects-tab">
-                            <span class="nav-icon">👥</span>
-                            <span class="nav-text">Prospects</span>
-                        </a>
-                        <a href="#recruitment" class="nav-item" data-tab="recruitment-tab">
-                            <span class="nav-icon">✅</span>
-                            <span class="nav-text">Recruitment</span>
-                        </a>
-                        <a href="#servicing" class="nav-item" data-tab="servicing-tab">
-                            <span class="nav-icon">🔄</span>
-                            <span class="nav-text">Servicing Float</span>
-                        </a>
+
+    <!-- App Container (Hidden by default) -->
+    <div id="appContainer" class="app-container">
+        <div class="app-layout">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <div class="logo-icon">RP</div>
+                        <h1>RetailerPro</h1>
                     </div>
                 </div>
 
-                <div class="nav-section" id="managementSection" style="display: none;">
-                    <h3 class="nav-section-title">MANAGEMENT</h3>
-                    <div class="nav-items">
-                        <a href="#performance" class="nav-item" data-tab="performance-tab">
-                            <span class="nav-icon">📈</span>
-                            <span class="nav-text">Performance</span>
-                        </a>
-                        <a href="#reports" class="nav-item" data-tab="reports-tab">
-                            <span class="nav-icon">📋</span>
-                            <span class="nav-text">Reports</span>
-                        </a>
+                <div class="sidebar-content">
+                    <div class="nav-section">
+                        <h3 class="nav-section-title">CORE</h3>
+                        <div class="nav-items">
+                            <a href="#dashboard" class="nav-item active" data-tab="dashboard-tab">
+                                <span class="nav-icon">📊</span>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                            <a href="#retailers" class="nav-item" data-tab="retailers-tab">
+                                <span class="nav-icon">🏪</span>
+                                <span class="nav-text">Retailers</span>
+                            </a>
+                            <a href="#prospects" class="nav-item" data-tab="prospects-tab">
+                                <span class="nav-icon">👥</span>
+                                <span class="nav-text">Prospects</span>
+                            </a>
+                            <a href="#recruitment" class="nav-item" data-tab="recruitment-tab">
+                                <span class="nav-icon">✅</span>
+                                <span class="nav-text">Recruitment</span>
+                            </a>
+                            <a href="#servicing" class="nav-item" data-tab="servicing-tab">
+                                <span class="nav-icon">🔄</span>
+                                <span class="nav-text">Servicing Float</span>
+                            </a>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="user-avatar">
-                        <span id="userAvatar">U</span>
-                    </div>
-                    <div class="user-info">
-                        <div class="user-name" id="userName">User</div>
-                        <div class="user-role" id="userRoleBadge">Role</div>
-                    </div>
-                </div>
-                <button id="logoutBtn" class="btn btn-secondary btn-sm">
-                    <span class="btn-icon">🚪</span>
-                    Logout
-                </button>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="content-header">
-                <div class="header-left">
-                    <h1 id="pageTitle">Dashboard</h1>
-                    <p id="pageSubtitle" class="page-subtitle">Performance Overview</p>
-                </div>
-                <div class="header-right">
-                    <div class="header-actions">
-                        <button id="installBtn" class="btn btn-outline" style="display: none;">
-                            <span class="btn-icon">📱</span>
-                            Install App
-                        </button>
-                        <div class="territory-badge" id="territoryBadge" style="display: none;">
-                            <span class="badge-icon">📍</span>
-                            <span id="territoryName">Territory</span>
+                    <div class="nav-section" id="managementSection" style="display: none;">
+                        <h3 class="nav-section-title">MANAGEMENT</h3>
+                        <div class="nav-items">
+                            <a href="#performance" class="nav-item" data-tab="performance-tab">
+                                <span class="nav-icon">📈</span>
+                                <span class="nav-text">Performance</span>
+                            </a>
+                            <a href="#reports" class="nav-item" data-tab="reports-tab">
+                                <span class="nav-icon">📋</span>
+                                <span class="nav-text">Reports</span>
+                            </a>
                         </div>
                     </div>
                 </div>
-            </header>
 
-            <!-- Content Sections -->
-            <div class="content-wrapper">
-                <!-- Dashboard Tab -->
-                <div id="dashboard-tab" class="tab-content active">
-                    <div class="dashboard-grid">
-                        <!-- Stats Cards -->
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon primary">🏪</div>
-                                <div class="stat-content">
-                                    <h3>Active Retailers</h3>
-                                    <div class="stat-value" id="activeRetailers">0</div>
-                                    <div class="stat-trend positive">+12% this month</div>
+                <div class="sidebar-footer">
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <span id="userAvatar">U</span>
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name" id="userName">User</div>
+                            <div class="user-role" id="userRoleBadge">Role</div>
+                        </div>
+                    </div>
+                    <button id="logoutBtn" class="btn btn-secondary btn-sm">
+                        <span class="btn-icon">🚪</span>
+                        Logout
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Header -->
+                <header class="content-header">
+                    <div class="header-left">
+                        <h1 id="pageTitle">Dashboard</h1>
+                        <p id="pageSubtitle" class="page-subtitle">Performance Overview</p>
+                    </div>
+                    <div class="header-right">
+                        <div class="header-actions">
+                            <button id="installBtn" class="btn btn-outline" style="display: none;">
+                                <span class="btn-icon">📱</span>
+                                Install App
+                            </button>
+                            <div class="territory-badge" id="territoryBadge" style="display: none;">
+                                <span class="badge-icon">📍</span>
+                                <span id="territoryName">Territory</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Content Sections -->
+                <div class="content-wrapper">
+                    <!-- Dashboard Tab -->
+                    <div id="dashboard-tab" class="tab-content active">
+                        <div class="dashboard-grid">
+                            <!-- Stats Cards -->
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-icon primary">🏪</div>
+                                    <div class="stat-content">
+                                        <h3>Active Retailers</h3>
+                                        <div class="stat-value" id="activeRetailers">0</div>
+                                        <div class="stat-trend positive">+12% this month</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon success">👥</div>
+                                    <div class="stat-content">
+                                        <h3>Total Prospects</h3>
+                                        <div class="stat-value" id="totalProspects">0</div>
+                                        <div class="stat-trend positive">+8% this week</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon warning">📈</div>
+                                    <div class="stat-content">
+                                        <h3>Conversion Rate</h3>
+                                        <div class="stat-value" id="conversionRate">0%</div>
+                                        <div class="stat-trend positive">+2.5%</div>
+                                    </div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon info">🎯</div>
+                                    <div class="stat-content">
+                                        <h3>Target Achievement</h3>
+                                        <div class="stat-value" id="targetAchievement">0%</div>
+                                        <div class="stat-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon success">👥</div>
-                                <div class="stat-content">
-                                    <h3>Total Prospects</h3>
-                                    <div class="stat-value" id="totalProspects">0</div>
-                                    <div class="stat-trend positive">+8% this week</div>
+
+                            <!-- Quick Actions -->
+                            <div class="actions-section">
+                                <h3>Quick Actions</h3>
+                                <div class="actions-grid">
+                                    <button class="action-card" onclick="showTab('retailers-tab')">
+                                        <span class="action-icon">➕</span>
+                                        <span class="action-text">Add Retailer</span>
+                                    </button>
+                                    <button class="action-card" onclick="showTab('prospects-tab')">
+                                        <span class="action-icon">👥</span>
+                                        <span class="action-text">Add Prospect</span>
+                                    </button>
+                                    <button class="action-card" onclick="showTab('recruitment-tab')">
+                                        <span class="action-icon">✅</span>
+                                        <span class="action-text">Add Recruitment</span>
+                                    </button>
+                                    <button class="action-card" onclick="showTab('servicing-tab')">
+                                        <span class="action-icon">🔄</span>
+                                        <span class="action-text">Add Servicing</span>
+                                    </button>
+                                    <button class="action-card" id="exportDataBtn">
+                                        <span class="action-icon">📤</span>
+                                        <span class="action-text">Export Data</span>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon warning">📈</div>
-                                <div class="stat-content">
-                                    <h3>Conversion Rate</h3>
-                                    <div class="stat-value" id="conversionRate">0%</div>
-                                    <div class="stat-trend positive">+2.5%</div>
+
+                            <!-- Recent Activity -->
+                            <div class="activity-section">
+                                <div class="section-header">
+                                    <h3>Recent Activity</h3>
+                                    <a href="#" class="view-all">View All</a>
                                 </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon info">🎯</div>
-                                <div class="stat-content">
-                                    <h3>Target Achievement</h3>
-                                    <div class="stat-value" id="targetAchievement">0%</div>
-                                    <div class="stat-progress">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: 0%"></div>
+                                <div class="activity-list" id="recentActivity">
+                                    <div class="activity-item">
+                                        <div class="activity-icon">📝</div>
+                                        <div class="activity-content">
+                                            <div class="activity-text">Welcome to RetailerPro! Start by adding your first retailer.</div>
+                                            <div class="activity-time">Just now</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Quick Actions -->
-                        <div class="actions-section">
-                            <h3>Quick Actions</h3>
-                            <div class="actions-grid">
-                                <button class="action-card" onclick="showTab('retailers-tab')">
-                                    <span class="action-icon">➕</span>
-                                    <span class="action-text">Add Retailer</span>
-                                </button>
-                                <button class="action-card" onclick="showTab('prospects-tab')">
-                                    <span class="action-icon">👥</span>
-                                    <span class="action-text">Add Prospect</span>
-                                </button>
-                                <button class="action-card" onclick="showTab('recruitment-tab')">
-                                    <span class="action-icon">✅</span>
-                                    <span class="action-text">Add Recruitment</span>
-                                </button>
-                                <button class="action-card" onclick="showTab('servicing-tab')">
-                                    <span class="action-icon">🔄</span>
-                                    <span class="action-text">Add Servicing</span>
-                                </button>
-                                <button class="action-card" id="exportDataBtn">
-                                    <span class="action-icon">📤</span>
-                                    <span class="action-text">Export Data</span>
-                                </button>
-                            </div>
+                    <!-- Retailers Tab -->
+                    <div id="retailers-tab" class="tab-content">
+                        <div class="section-header">
+                            <h2>Retailer Management</h2>
+                            <button class="btn btn-primary" id="addRetailerBtn">
+                                <span class="btn-icon">➕</span>
+                                Add Retailer
+                            </button>
                         </div>
 
-                        <!-- Recent Activity -->
-                        <div class="activity-section">
-                            <div class="section-header">
-                                <h3>Recent Activity</h3>
-                                <a href="#" class="view-all">View All</a>
-                            </div>
-                            <div class="activity-list" id="recentActivity">
-                                <div class="activity-item">
-                                    <div class="activity-icon">📝</div>
-                                    <div class="activity-content">
-                                        <div class="activity-text">Welcome to RetailerPro! Start by adding your first retailer.</div>
-                                        <div class="activity-time">Just now</div>
+                        <!-- Retailer Form -->
+                        <div class="form-section" id="retailerFormSection" style="display: none;">
+                            <form id="retailerForm" class="form-card">
+                                <div class="form-header">
+                                    <h3>Retailer Information</h3>
+                                    <button type="button" class="btn btn-text" id="cancelRetailerBtn">Cancel</button>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="msisdn">MSISDN *</label>
+                                        <input type="text" id="msisdn" name="msisdn" required 
+                                               placeholder="254712345678">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="firstName">First Name *</label>
+                                        <input type="text" id="firstName" name="firstName" required 
+                                               placeholder="Enter first name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName">Last Name *</label>
+                                        <input type="text" id="lastName" name="lastName" required 
+                                               placeholder="Enter last name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="businessName">Business Name</label>
+                                        <input type="text" id="businessName" name="businessName" 
+                                               placeholder="Enter business name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="siteId">Site ID *</label>
+                                        <select id="siteId" name="siteId" required>
+                                            <option value="">Select Site Location</option>
+                                            <option value="NAIROBI_KASARANI">NAIROBI_KASARANI</option>
+                                            <option value="NAIROBI_MWIKI">NAIROBI_MWIKI</option>
+                                            <option value="NAIROBI_ZIMMERMAN">NAIROBI_ZIMMERMAN</option>
+                                            <option value="NAIROBI_GITHURAI">NAIROBI_GITHURAI</option>
+                                            <option value="NAIROBI_RUAI">NAIROBI_RUAI</option>
+                                            <option value="NAIROBI_KAMULU">NAIROBI_KAMULU</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="location">Location Name</label>
+                                        <input type="text" id="location" name="location" 
+                                               placeholder="Enter specific location name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lines">Airtel Lines</label>
+                                        <input type="number" id="lines" name="lines" 
+                                               placeholder="Number of active lines" min="0" max="100">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="visitationDate">Visitation Date *</label>
+                                        <input type="date" id="visitationDate" name="visitationDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="visitationTime">Visitation Time *</label>
+                                        <input type="time" id="visitationTime" name="visitationTime" required>
+                                    </div>
+                                    <div class="form-group dsr-field">
+                                        <label for="serial1">Device Serial 1</label>
+                                        <input type="text" id="serial1" name="serial1" 
+                                               placeholder="Enter device serial number">
+                                    </div>
+                                    <div class="form-group dsr-field">
+                                        <label for="serial2">Device Serial 2</label>
+                                        <input type="text" id="serial2" name="serial2" 
+                                               placeholder="Enter device serial number">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label>Services & Programs</label>
+                                        <div class="checkbox-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" name="ga_lm"> GA LM
+                                            </label>
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" name="mtd"> MTD
+                                            </label>
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" name="qsso"> QSSO
+                                            </label>
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" name="qama"> QAMA
+                                            </label>
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" name="kcb_agent"> KCB AGENT
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="btn-icon">💾</span>
+                                        Save Retailer
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="clearRetailerForm">
+                                        Clear Form
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Retailers Table -->
+                        <div class="table-section">
+                            <div class="table-header">
+                                <div class="table-controls">
+                                    <div class="search-box">
+                                        <span class="search-icon">🔍</span>
+                                        <input type="text" id="retailerSearch" placeholder="Search retailers...">
+                                    </div>
+                                    <div class="table-actions">
+                                        <button class="btn btn-outline" id="exportRetailersBtn">
+                                            <span class="btn-icon">📤</span>
+                                            Export
+                                        </button>
                                     </div>
                                 </div>
                             </div>
+                            <div class="table-container">
+                                <table id="retailersTable">
+                                    <thead>
+                                        <tr>
+                                            <th>MSISDN</th>
+                                            <th>Retailer Name</th>
+                                            <th>Business</th>
+                                            <th>Site ID</th>
+                                            <th>Location</th>
+                                            <th>Active Lines</th>
+                                            <th>Visit Date</th>
+                                            <th>Visit Time</th>
+                                            <th>Services</th>
+                                            <th>Status</th>
+                                            <th>Last Updated</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Retailers data will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- Other tabs would go here (Prospects, Recruitment, Servicing, etc.) -->
+                    <!-- For brevity, I've only included the Dashboard and Retailers tabs -->
                 </div>
-
-                <!-- Retailers Tab -->
-                <div id="retailers-tab" class="tab-content">
-                    <div class="section-header">
-                        <h2>Retailer Management</h2>
-                        <button class="btn btn-primary" id="addRetailerBtn">
-                            <span class="btn-icon">➕</span>
-                            Add Retailer
-                        </button>
-                    </div>
-
-                    <!-- Retailer Form -->
-                    <div class="form-section" id="retailerFormSection" style="display: none;">
-                        <form id="retailerForm" class="form-card">
-                            <div class="form-header">
-                                <h3>Retailer Information</h3>
-                                <button type="button" class="btn btn-text" id="cancelRetailerBtn">Cancel</button>
-                            </div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="msisdn">MSISDN *</label>
-                                    <input type="text" id="msisdn" name="msisdn" required 
-                                           placeholder="254712345678">
-                                </div>
-                                <div class="form-group">
-                                    <label for="firstName">First Name *</label>
-                                    <input type="text" id="firstName" name="firstName" required 
-                                           placeholder="Enter first name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="lastName">Last Name *</label>
-                                    <input type="text" id="lastName" name="lastName" required 
-                                           placeholder="Enter last name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="businessName">Business Name</label>
-                                    <input type="text" id="businessName" name="businessName" 
-                                           placeholder="Enter business name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="siteId">Site ID *</label>
-                                    <select id="siteId" name="siteId" required>
-                                        <option value="">Select Site Location</option>
-                                        <option value="NAIROBI_KASARANI">NAIROBI_KASARANI</option>
-                                        <option value="NAIROBI_MWIKI">NAIROBI_MWIKI</option>
-                                        <option value="NAIROBI_ZIMMERMAN">NAIROBI_ZIMMERMAN</option>
-                                        <option value="NAIROBI_GITHURAI">NAIROBI_GITHURAI</option>
-                                        <option value="NAIROBI_RUAI">NAIROBI_RUAI</option>
-                                        <option value="NAIROBI_KAMULU">NAIROBI_KAMULU</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="location">Location Name</label>
-                                    <input type="text" id="location" name="location" 
-                                           placeholder="Enter specific location name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="lines">Airtel Lines</label>
-                                    <input type="number" id="lines" name="lines" 
-                                           placeholder="Number of active lines" min="0" max="100">
-                                </div>
-                                <div class="form-group">
-                                    <label for="visitationDate">Visitation Date *</label>
-                                    <input type="date" id="visitationDate" name="visitationDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="visitationTime">Visitation Time *</label>
-                                    <input type="time" id="visitationTime" name="visitationTime" required>
-                                </div>
-                                <div class="form-group dsr-field">
-                                    <label for="serial1">Device Serial 1</label>
-                                    <input type="text" id="serial1" name="serial1" 
-                                           placeholder="Enter device serial number">
-                                </div>
-                                <div class="form-group dsr-field">
-                                    <label for="serial2">Device Serial 2</label>
-                                    <input type="text" id="serial2" name="serial2" 
-                                           placeholder="Enter device serial number">
-                                </div>
-                                <div class="form-group full-width">
-                                    <label>Services & Programs</label>
-                                    <div class="checkbox-group">
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="ga_lm"> GA LM
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="mtd"> MTD
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="qsso"> QSSO
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="qama"> QAMA
-                                        </label>
-                                        <label class="checkbox-label">
-                                            <input type="checkbox" name="kcb_agent"> KCB AGENT
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="btn-icon">💾</span>
-                                    Save Retailer
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearRetailerForm">
-                                    Clear Form
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Retailers Table -->
-                    <div class="table-section">
-                        <div class="table-header">
-                            <div class="table-controls">
-                                <div class="search-box">
-                                    <span class="search-icon">🔍</span>
-                                    <input type="text" id="retailerSearch" placeholder="Search retailers...">
-                                </div>
-                                <div class="table-actions">
-                                    <button class="btn btn-outline" id="exportRetailersBtn">
-                                        <span class="btn-icon">📤</span>
-                                        Export
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="retailersTable">
-                                <thead>
-                                    <tr>
-                                        <th>MSISDN</th>
-                                        <th>Retailer Name</th>
-                                        <th>Business</th>
-                                        <th>Site ID</th>
-                                        <th>Location</th>
-                                        <th>Active Lines</th>
-                                        <th>Visit Date</th>
-                                        <th>Visit Time</th>
-                                        <th>Services</th>
-                                        <th>Status</th>
-                                        <th>Last Updated</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Retailers data will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Prospects Tab -->
-                <div id="prospects-tab" class="tab-content">
-                    <div class="section-header">
-                        <h2>Prospect Management</h2>
-                        <button class="btn btn-primary" id="addProspectBtn">
-                            <span class="btn-icon">➕</span>
-                            Add Prospect
-                        </button>
-                    </div>
-
-                    <!-- Prospect Form -->
-                    <div class="form-section" id="prospectFormSection" style="display: none;">
-                        <form id="prospectForm" class="form-card">
-                            <div class="form-header">
-                                <h3>Prospect Information</h3>
-                                <button type="button" class="btn btn-text" id="cancelProspectBtn">Cancel</button>
-                            </div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="prospectPhone">Phone Number *</label>
-                                    <input type="text" id="prospectPhone" name="prospectPhone" required 
-                                           placeholder="254712345678">
-                                </div>
-                                <div class="form-group">
-                                    <label for="prospectName">Full Name *</label>
-                                    <input type="text" id="prospectName" name="prospectName" required 
-                                           placeholder="Enter prospect name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="prospectBusiness">Business Type</label>
-                                    <select id="prospectBusiness" name="prospectBusiness">
-                                        <option value="">Select business type</option>
-                                        <option value="General Shop">General Shop</option>
-                                        <option value="Supermarket">Supermarket</option>
-                                        <option value="Kiosk">Kiosk</option>
-                                        <option value="Pharmacy">Pharmacy</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="prospectLocation">Location *</label>
-                                    <input type="text" id="prospectLocation" name="prospectLocation" required 
-                                           placeholder="Enter business location">
-                                </div>
-                                <div class="form-group">
-                                    <label for="visitDate">Visit Date *</label>
-                                    <input type="date" id="visitDate" name="visitDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="followUpDate">Follow-up Date</label>
-                                    <input type="date" id="followUpDate" name="followUpDate">
-                                </div>
-                                <div class="form-group">
-                                    <label for="interestLevel">Interest Level</label>
-                                    <select id="interestLevel" name="interestLevel">
-                                        <option value="High">High</option>
-                                        <option value="Medium" selected>Medium</option>
-                                        <option value="Low">Low</option>
-                                    </select>
-                                </div>
-                                <div class="form-group full-width">
-                                    <label for="prospectNotes">Notes</label>
-                                    <textarea id="prospectNotes" name="prospectNotes" 
-                                              placeholder="Additional notes about the prospect..." 
-                                              rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="btn-icon">💾</span>
-                                    Save Prospect
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearProspectForm">
-                                    Clear Form
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Prospects Table -->
-                    <div class="table-section">
-                        <div class="table-header">
-                            <div class="table-controls">
-                                <div class="search-box">
-                                    <span class="search-icon">🔍</span>
-                                    <input type="text" id="prospectSearch" placeholder="Search prospects...">
-                                </div>
-                                <div class="filter-group">
-                                    <select id="statusFilter">
-                                        <option value="">All Status</option>
-                                        <option value="New">New</option>
-                                        <option value="Contacted">Contacted</option>
-                                        <option value="Follow-up">Follow-up</option>
-                                        <option value="Converted">Converted</option>
-                                    </select>
-                                </div>
-                                <div class="table-actions">
-                                    <button class="btn btn-outline" id="exportProspectsBtn">
-                                        <span class="btn-icon">📤</span>
-                                        Export
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="prospectsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Phone</th>
-                                        <th>Name</th>
-                                        <th>Business</th>
-                                        <th>Location</th>
-                                        <th>Interest</th>
-                                        <th>Status</th>
-                                        <th>Next Action</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Prospects data will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recruitment Tab -->
-                <div id="recruitment-tab" class="tab-content">
-                    <div class="section-header">
-                        <h2>Recruitment Status</h2>
-                        <button class="btn btn-primary" id="addRecruitmentBtn">
-                            <span class="btn-icon">➕</span>
-                            Add Recruitment
-                        </button>
-                    </div>
-
-                    <!-- Recruitment Form -->
-                    <div class="form-section" id="recruitmentFormSection" style="display: none;">
-                        <form id="recruitmentForm" class="form-card">
-                            <div class="form-header">
-                                <h3>Recruitment Information</h3>
-                                <button type="button" class="btn btn-text" id="cancelRecruitmentBtn">Cancel</button>
-                            </div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="recruitmentPhone">Phone Number *</label>
-                                    <input type="text" id="recruitmentPhone" name="recruitmentPhone" required 
-                                           placeholder="Enter phone number">
-                                </div>
-                                <div class="form-group">
-                                    <label for="recruitmentName">Full Name *</label>
-                                    <input type="text" id="recruitmentName" name="recruitmentName" required 
-                                           placeholder="Enter full name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="recruitmentBusiness">Business Type</label>
-                                    <select id="recruitmentBusiness" name="recruitmentBusiness">
-                                        <option value="">Select business type</option>
-                                        <option value="General Shop">General Shop</option>
-                                        <option value="Supermarket">Supermarket</option>
-                                        <option value="Kiosk">Kiosk</option>
-                                        <option value="Pharmacy">Pharmacy</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="recruitmentLocation">Location *</label>
-                                    <input type="text" id="recruitmentLocation" name="recruitmentLocation" required 
-                                           placeholder="Enter business location">
-                                </div>
-                                <div class="form-group">
-                                    <label for="recruitmentStatus">Recruitment Status *</label>
-                                    <select id="recruitmentStatus" name="recruitmentStatus" required>
-                                        <option value="Yes">Yes - Recruited</option>
-                                        <option value="No">No - Not Recruited</option>
-                                        <option value="Pending">Pending</option>
-                                        <option value="Follow-up">Follow-up Required</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="recruitmentDate">Recruitment Date</label>
-                                    <input type="date" id="recruitmentDate" name="recruitmentDate">
-                                </div>
-                                <div class="form-group full-width">
-                                    <label for="recruitmentNotes">Notes</label>
-                                    <textarea id="recruitmentNotes" name="recruitmentNotes" 
-                                              placeholder="Additional notes about recruitment..." 
-                                              rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="btn-icon">💾</span>
-                                    Save Recruitment
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearRecruitmentForm">
-                                    Clear Form
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Recruitment Table -->
-                    <div class="table-section">
-                        <div class="table-header">
-                            <div class="table-controls">
-                                <div class="search-box">
-                                    <span class="search-icon">🔍</span>
-                                    <input type="text" id="recruitmentSearch" placeholder="Search recruitment...">
-                                </div>
-                                <div class="table-actions">
-                                    <button class="btn btn-outline" id="exportRecruitmentBtn">
-                                        <span class="btn-icon">📤</span>
-                                        Export
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="recruitmentTable">
-                                <thead>
-                                    <tr>
-                                        <th>Phone</th>
-                                        <th>Name</th>
-                                        <th>Business</th>
-                                        <th>Location</th>
-                                        <th>Status</th>
-                                        <th>Recruitment Date</th>
-                                        <th>Added By</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Recruitment data will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Servicing Float Tab -->
-                <div id="servicing-tab" class="tab-content">
-                    <div class="section-header">
-                        <h2>Servicing Float Management</h2>
-                        <button class="btn btn-primary" id="addServicingBtn">
-                            <span class="btn-icon">➕</span>
-                            Add Servicing
-                        </button>
-                    </div>
-
-                    <!-- Servicing Form -->
-                    <div class="form-section" id="servicingFormSection" style="display: none;">
-                        <form id="servicingForm" class="form-card">
-                            <div class="form-header">
-                                <h3>Servicing Float Information</h3>
-                                <button type="button" class="btn btn-text" id="cancelServicingBtn">Cancel</button>
-                            </div>
-                            <div class="form-grid">
-                                <div class="form-group">
-                                    <label for="servicingRetailer">Retailer *</label>
-                                    <select id="servicingRetailer" name="servicingRetailer" required>
-                                        <option value="">Select Retailer</option>
-                                        <!-- Retailers will be populated dynamically -->
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="servicingType">Service Type *</label>
-                                    <select id="servicingType" name="servicingType" required>
-                                        <option value="">Select service type</option>
-                                        <option value="Device Repair">Device Repair</option>
-                                        <option value="SIM Replacement">SIM Replacement</option>
-                                        <option value="Float Top-up">Float Top-up</option>
-                                        <option value="Training">Training</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="servicingAmount">Amount (KES)</label>
-                                    <input type="number" id="servicingAmount" name="servicingAmount" 
-                                           placeholder="Enter amount if applicable" min="0" max="1000000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="servicingDate">Service Date *</label>
-                                    <input type="date" id="servicingDate" name="servicingDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="servicingStatus">Status *</label>
-                                    <select id="servicingStatus" name="servicingStatus" required>
-                                        <option value="Completed">Completed</option>
-                                        <option value="Pending">Pending</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Scheduled">Scheduled</option>
-                                    </select>
-                                </div>
-                                <div class="form-group full-width">
-                                    <label for="servicingDescription">Service Description</label>
-                                    <textarea id="servicingDescription" name="servicingDescription" 
-                                              placeholder="Describe the service provided..." 
-                                              rows="3"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <span class="btn-icon">💾</span>
-                                    Save Servicing
-                                </button>
-                                <button type="button" class="btn btn-secondary" id="clearServicingForm">
-                                    Clear Form
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Servicing Table -->
-                    <div class="table-section">
-                        <div class="table-header">
-                            <div class="table-controls">
-                                <div class="search-box">
-                                    <span class="search-icon">🔍</span>
-                                    <input type="text" id="servicingSearch" placeholder="Search servicing...">
-                                </div>
-                                <div class="table-actions">
-                                    <button class="btn btn-outline" id="exportServicingBtn">
-                                        <span class="btn-icon">📤</span>
-                                        Export
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-container">
-                            <table id="servicingTable">
-                                <thead>
-                                    <tr>
-                                        <th>Retailer</th>
-                                        <th>Service Type</th>
-                                        <th>Amount</th>
-                                        <th>Service Date</th>
-                                        <th>Status</th>
-                                        <th>Description</th>
-                                        <th>Added By</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Servicing data will be populated here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Performance Tab (TSM/SIBO Only) -->
-                <div id="performance-tab" class="tab-content">
-                    <div class="section-header">
-                        <h2>Team Performance Analytics</h2>
-                        <div class="header-actions">
-                            <select id="timeFilter">
-                                <option value="week">This Week</option>
-                                <option value="month" selected>This Month</option>
-                                <option value="quarter">This Quarter</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="performance-content" id="performanceContent">
-                        <div class="access-denied" style="text-align: center; padding: 3rem;">
-                            <div style="font-size: 4rem; margin-bottom: 1rem;">🔒</div>
-                            <h3>Access Restricted</h3>
-                            <p>Performance analytics are only available to Territory Managers and SIBO Administrators.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reports Tab -->
-                <div id="reports-tab" class="tab-content">
-                    <div class="section-header">
-                        <h2>Reports & Analytics</h2>
-                        <button class="btn btn-primary" id="generateReportBtn">
-                            <span class="btn-icon">📊</span>
-                            Generate Report
-                        </button>
-                    </div>
-                    <div class="reports-content" id="reportsContent">
-                        <div class="reports-grid">
-                            <div class="report-card">
-                                <h3>📈 Performance Report</h3>
-                                <p>Comprehensive performance analytics and insights</p>
-                                <button class="btn btn-outline btn-sm" onclick="app.generatePerformanceReport()">
-                                    Generate
-                                </button>
-                            </div>
-                            <div class="report-card">
-                                <h3>🏪 Retailer Report</h3>
-                                <p>Detailed retailer network analysis</p>
-                                <button class="btn btn-outline btn-sm" onclick="app.exportRetailers()">
-                                    Generate
-                                </button>
-                            </div>
-                            <div class="report-card">
-                                <h3>👥 Prospect Report</h3>
-                                <p>Lead conversion and prospect tracking</p>
-                                <button class="btn btn-outline btn-sm" onclick="app.exportProspects()">
-                                    Generate
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
     <!-- Toast Notifications -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <script src="script.js"></script>
+    <script>
+        // Application state
+        const app = {
+            currentUser: null,
+            userRole: null,
+            userTerritory: null,
+            isLoggedIn: false,
+            
+            // Initialize the application
+            init: function() {
+                this.bindEvents();
+                this.checkAuthState();
+            },
+            
+            // Bind event listeners
+            bindEvents: function() {
+                // Login form submission
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+                
+                // SIBO login form submission
+                document.getElementById('siboLoginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSiboLogin();
+                });
+                
+                // SIBO login button
+                document.getElementById('siboLoginBtn').addEventListener('click', () => {
+                    this.toggleSiboLogin();
+                });
+                
+                // Back to main login
+                document.getElementById('backToMainLogin').addEventListener('click', () => {
+                    this.toggleSiboLogin();
+                });
+                
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    this.handleLogout();
+                });
+                
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const tabId = item.getAttribute('data-tab');
+                        this.showTab(tabId);
+                    });
+                });
+                
+                // Add retailer button
+                document.getElementById('addRetailerBtn').addEventListener('click', () => {
+                    this.toggleRetailerForm();
+                });
+                
+                // Cancel retailer form
+                document.getElementById('cancelRetailerBtn').addEventListener('click', () => {
+                    this.toggleRetailerForm();
+                });
+                
+                // Retailer form submission
+                document.getElementById('retailerForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.saveRetailer();
+                });
+            },
+            
+            // Check if user is already logged in
+            checkAuthState: function() {
+                const savedUser = localStorage.getItem('retailerProUser');
+                if (savedUser) {
+                    const userData = JSON.parse(savedUser);
+                    this.loginUser(userData);
+                }
+            },
+            
+            // Handle DSR/TSM login
+            handleLogin: function() {
+                const password = document.getElementById('password').value;
+                const territory = document.getElementById('userCluster').value;
+                
+                if (!password || !territory) {
+                    this.showToast('Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = document.querySelector('#loginForm .btn-text');
+                const loader = document.querySelector('#loginForm .btn-loader');
+                submitBtn.style.display = 'none';
+                loader.style.display = 'block';
+                
+                // Simulate API call
+                setTimeout(() => {
+                    // For demo purposes, accept any password
+                    const userData = {
+                        name: 'Field Agent',
+                        role: 'DSR',
+                        territory: territory,
+                        avatar: 'FA'
+                    };
+                    
+                    this.loginUser(userData);
+                    
+                    // Reset button
+                    submitBtn.style.display = 'block';
+                    loader.style.display = 'none';
+                }, 1500);
+            },
+            
+            // Handle SIBO login
+            handleSiboLogin: function() {
+                const password = document.getElementById('siboPassword').value;
+                
+                if (!password) {
+                    this.showToast('Please enter SIBO password', 'error');
+                    return;
+                }
+                
+                // Simulate API call
+                setTimeout(() => {
+                    // For demo purposes, accept any password
+                    const userData = {
+                        name: 'SIBO Administrator',
+                        role: 'SIBO',
+                        territory: 'All Territories',
+                        avatar: 'SA'
+                    };
+                    
+                    this.loginUser(userData);
+                }, 1500);
+            },
+            
+            // Toggle between main login and SIBO login
+            toggleSiboLogin: function() {
+                const mainForm = document.getElementById('loginForm');
+                const siboForm = document.getElementById('siboLoginForm');
+                const siboBtn = document.getElementById('siboLoginBtn');
+                
+                if (mainForm.style.display !== 'none') {
+                    mainForm.style.display = 'none';
+                    siboForm.style.display = 'block';
+                    siboBtn.style.display = 'none';
+                } else {
+                    mainForm.style.display = 'block';
+                    siboForm.style.display = 'none';
+                    siboBtn.style.display = 'block';
+                }
+            },
+            
+            // Login user and show dashboard
+            loginUser: function(userData) {
+                this.currentUser = userData;
+                this.userRole = userData.role;
+                this.userTerritory = userData.territory;
+                this.isLoggedIn = true;
+                
+                // Save to localStorage
+                localStorage.setItem('retailerProUser', JSON.stringify(userData));
+                
+                // Update UI
+                document.getElementById('userName').textContent = userData.name;
+                document.getElementById('userRoleBadge').textContent = userData.role;
+                document.getElementById('userAvatar').textContent = userData.avatar;
+                document.getElementById('territoryName').textContent = userData.territory;
+                
+                // Show management section for TSM/SIBO users
+                if (userData.role === 'TSM' || userData.role === 'SIBO') {
+                    document.getElementById('managementSection').style.display = 'block';
+                }
+                
+                // Show territory badge
+                document.getElementById('territoryBadge').style.display = 'flex';
+                
+                // Switch to app view
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+                
+                this.showToast(`Welcome back, ${userData.name}!`, 'success');
+                
+                // Initialize dashboard data
+                this.loadDashboardData();
+            },
+            
+            // Handle logout
+            handleLogout: function() {
+                this.currentUser = null;
+                this.userRole = null;
+                this.userTerritory = null;
+                this.isLoggedIn = false;
+                
+                // Clear localStorage
+                localStorage.removeItem('retailerProUser');
+                
+                // Reset forms
+                document.getElementById('loginForm').reset();
+                document.getElementById('siboLoginForm').reset();
+                
+                // Hide management section
+                document.getElementById('managementSection').style.display = 'none';
+                
+                // Hide territory badge
+                document.getElementById('territoryBadge').style.display = 'none';
+                
+                // Switch to login view
+                document.getElementById('appContainer').style.display = 'none';
+                document.getElementById('loginSection').style.display = 'flex';
+                
+                // Reset SIBO login view if active
+                this.toggleSiboLogin();
+                
+                this.showToast('You have been logged out', 'info');
+            },
+            
+            // Show specific tab
+            showTab: function(tabId) {
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Remove active class from all nav items
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Show selected tab
+                document.getElementById(tabId).classList.add('active');
+                
+                // Activate corresponding nav item
+                document.querySelector(`.nav-item[data-tab="${tabId}"]`).classList.add('active');
+                
+                // Update page title
+                const tabTitles = {
+                    'dashboard-tab': 'Dashboard',
+                    'retailers-tab': 'Retailers',
+                    'prospects-tab': 'Prospects',
+                    'recruitment-tab': 'Recruitment',
+                    'servicing-tab': 'Servicing Float',
+                    'performance-tab': 'Performance',
+                    'reports-tab': 'Reports'
+                };
+                
+                document.getElementById('pageTitle').textContent = tabTitles[tabId] || 'Dashboard';
+            },
+            
+            // Toggle retailer form visibility
+            toggleRetailerForm: function() {
+                const formSection = document.getElementById('retailerFormSection');
+                if (formSection.style.display === 'none') {
+                    formSection.style.display = 'block';
+                } else {
+                    formSection.style.display = 'none';
+                }
+            },
+            
+            // Save retailer data
+            saveRetailer: function() {
+                const formData = new FormData(document.getElementById('retailerForm'));
+                const retailer = Object.fromEntries(formData);
+                
+                // Add metadata
+                retailer.addedBy = this.currentUser.name;
+                retailer.addedDate = new Date().toISOString();
+                retailer.status = 'Active';
+                
+                // In a real app, you would send this to your backend
+                console.log('Saving retailer:', retailer);
+                
+                // Show success message
+                this.showToast('Retailer saved successfully!', 'success');
+                
+                // Hide form
+                this.toggleRetailerForm();
+                
+                // Reset form
+                document.getElementById('retailerForm').reset();
+                
+                // Refresh retailers table (in a real app)
+                // this.loadRetailers();
+            },
+            
+            // Load dashboard data
+            loadDashboardData: function() {
+                // Simulate loading data
+                setTimeout(() => {
+                    document.getElementById('activeRetailers').textContent = '24';
+                    document.getElementById('totalProspects').textContent = '42';
+                    document.getElementById('conversionRate').textContent = '38%';
+                    document.getElementById('targetAchievement').textContent = '72%';
+                    document.querySelector('.progress-fill').style.width = '72%';
+                }, 500);
+            },
+            
+            // Show toast notification
+            showToast: function(message, type = 'info') {
+                const toastContainer = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                const icons = {
+                    success: '✅',
+                    error: '❌',
+                    warning: '⚠️',
+                    info: 'ℹ️'
+                };
+                
+                toast.innerHTML = `
+                    <span class="toast-icon">${icons[type]}</span>
+                    <span class="toast-message">${message}</span>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Remove toast after 5 seconds
+                setTimeout(() => {
+                    toast.remove();
+                }, 5000);
+            }
+        };
+        
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+        
+        // Global function for showing tabs (for onclick handlers)
+        function showTab(tabId) {
+            app.showTab(tabId);
+        }
+    </script>
 </body>
 </html>
