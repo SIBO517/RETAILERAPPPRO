@@ -1664,12 +1664,214 @@
             userRole: null,
             userTerritory: null,
             isLoggedIn: false,
-            data: {
+            
+            // Master data storage with cluster information
+            masterData: {
                 retailers: [],
                 prospects: [],
                 recruitment: [],
                 servicing: []
             },
+            
+            // Sample data for all clusters
+            sampleData: {
+                KASARANI: {
+                    retailers: [
+                        {
+                            msisdn: "254712345678",
+                            firstName: "John",
+                            lastName: "Kamau",
+                            businessName: "Kamau General Store",
+                            siteId: "NAIROBI_KASARANI",
+                            location: "Kasarani Market",
+                            lines: 3,
+                            visitationDate: "2024-01-15",
+                            visitationTime: "10:30",
+                            serial1: "SN123456",
+                            serial2: "SN789012",
+                            services: ["GA LM", "MTD"],
+                            status: "Active",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "KASARANI"
+                        }
+                    ],
+                    prospects: [
+                        {
+                            phone: "254723456789",
+                            name: "Mary Wanjiku",
+                            business: "General Shop",
+                            location: "Kasarani Sports View",
+                            visitDate: "2024-01-20",
+                            followUpDate: "2024-01-27",
+                            interestLevel: "High",
+                            notes: "Interested in becoming an agent",
+                            status: "New",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "KASARANI"
+                        }
+                    ],
+                    recruitment: [
+                        {
+                            phone: "254734567890",
+                            name: "Peter Maina",
+                            business: "Kiosk",
+                            location: "Kasarani Mwiki",
+                            status: "Yes",
+                            recruitmentDate: "2024-01-18",
+                            notes: "Successfully recruited",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "KASARANI"
+                        }
+                    ],
+                    servicing: [
+                        {
+                            retailer: "Kamau General Store",
+                            serviceType: "Float Top-up",
+                            amount: 5000,
+                            serviceDate: "2024-01-16",
+                            status: "Completed",
+                            description: "Regular float top-up",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "KASARANI"
+                        }
+                    ]
+                },
+                MWIKI: {
+                    retailers: [
+                        {
+                            msisdn: "254745678901",
+                            firstName: "Sarah",
+                            lastName: "Njeri",
+                            businessName: "Mwiki Supermarket",
+                            siteId: "NAIROBI_MWIKI",
+                            location: "Mwiki Shopping Center",
+                            lines: 5,
+                            visitationDate: "2024-01-14",
+                            visitationTime: "14:00",
+                            serial1: "SN345678",
+                            serial2: "SN901234",
+                            services: ["QSSO", "QAMA"],
+                            status: "Active",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "MWIKI"
+                        }
+                    ],
+                    prospects: [
+                        {
+                            phone: "254756789012",
+                            name: "David Ochieng",
+                            business: "Supermarket",
+                            location: "Mwiki Secondary",
+                            visitDate: "2024-01-19",
+                            followUpDate: "2024-01-26",
+                            interestLevel: "Medium",
+                            notes: "Considering agency partnership",
+                            status: "Contacted",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "MWIKI"
+                        }
+                    ],
+                    recruitment: [
+                        {
+                            phone: "254767890123",
+                            name: "Grace Akinyi",
+                            business: "Pharmacy",
+                            location: "Mwiki Aberdares",
+                            status: "Pending",
+                            recruitmentDate: "2024-01-17",
+                            notes: "Follow up required",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "MWIKI"
+                        }
+                    ],
+                    servicing: [
+                        {
+                            retailer: "Mwiki Supermarket",
+                            serviceType: "Device Repair",
+                            amount: 1500,
+                            serviceDate: "2024-01-13",
+                            status: "Completed",
+                            description: "Fixed card reader",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "MWIKI"
+                        }
+                    ]
+                },
+                ZIMMERMAN: {
+                    retailers: [
+                        {
+                            msisdn: "254778901234",
+                            firstName: "Michael",
+                            lastName: "Kipchoge",
+                            businessName: "Zimmart",
+                            siteId: "NAIROBI_ZIMMERMAN",
+                            location: "Zimmerman Base",
+                            lines: 4,
+                            visitationDate: "2024-01-16",
+                            visitationTime: "11:00",
+                            serial1: "SN567890",
+                            serial2: "SN123456",
+                            services: ["KCB AGENT", "MTD"],
+                            status: "Active",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "ZIMMERMAN"
+                        }
+                    ],
+                    prospects: [
+                        {
+                            phone: "254789012345",
+                            name: "Lucy Wambui",
+                            business: "General Shop",
+                            location: "Zimmerman Mirema",
+                            visitDate: "2024-01-21",
+                            followUpDate: "2024-01-28",
+                            interestLevel: "High",
+                            notes: "Very interested in partnership",
+                            status: "New",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "ZIMMERMAN"
+                        }
+                    ],
+                    recruitment: [
+                        {
+                            phone: "254790123456",
+                            name: "James Mutiso",
+                            business: "Kiosk",
+                            location: "Zimmerman Base Atlas",
+                            status: "Yes",
+                            recruitmentDate: "2024-01-15",
+                            notes: "New agent onboarded",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "ZIMMERMAN"
+                        }
+                    ],
+                    servicing: [
+                        {
+                            retailer: "Zimmart",
+                            serviceType: "Training",
+                            amount: 0,
+                            serviceDate: "2024-01-12",
+                            status: "Completed",
+                            description: "Agent training session",
+                            addedBy: "DSR Agent",
+                            addedDate: new Date().toISOString(),
+                            cluster: "ZIMMERMAN"
+                        }
+                    ]
+                }
+            },
+            
             locations: [
                 "NAIROBI_KAYOLE_JUAKALI", "NAIROBI_USIU", "NAIROBI_MIREMA_TREAT", "NAIROBI_KASARANI_SPORTS_VIEW",
                 "NAIROBI_ST.FRANCIS_HOSPITAL", "NAIROBI_ATHI_MARKET", "NAIROBI_MIREMA_DRIVE", "NAIROBI_RUAI_PCEA",
@@ -1702,7 +1904,7 @@
                 this.bindEvents();
                 this.checkAuthState();
                 this.populateLocations();
-                this.loadSampleData();
+                this.initializeMasterData();
             },
             
             // Bind event listeners
@@ -1821,6 +2023,65 @@
                 });
             },
             
+            // Initialize master data with sample data for all clusters
+            initializeMasterData: function() {
+                // Clear existing data
+                this.masterData = {
+                    retailers: [],
+                    prospects: [],
+                    recruitment: [],
+                    servicing: []
+                };
+                
+                // Load sample data for all clusters
+                Object.keys(this.sampleData).forEach(cluster => {
+                    const clusterData = this.sampleData[cluster];
+                    
+                    // Add retailers
+                    clusterData.retailers.forEach(retailer => {
+                        this.masterData.retailers.push(retailer);
+                    });
+                    
+                    // Add prospects
+                    clusterData.prospects.forEach(prospect => {
+                        this.masterData.prospects.push(prospect);
+                    });
+                    
+                    // Add recruitment
+                    clusterData.recruitment.forEach(recruitment => {
+                        this.masterData.recruitment.push(recruitment);
+                    });
+                    
+                    // Add servicing
+                    clusterData.servicing.forEach(servicing => {
+                        this.masterData.servicing.push(servicing);
+                    });
+                });
+            },
+            
+            // Get data based on user role and cluster
+            getUserData: function() {
+                if (!this.currentUser) return { retailers: [], prospects: [], recruitment: [], servicing: [] };
+                
+                const userCluster = this.userTerritory;
+                const userRole = this.userRole;
+                
+                // SIBO can access all data
+                if (userRole === 'SIBO') {
+                    return this.masterData;
+                }
+                
+                // TSM and DSR can only access their cluster data
+                const filteredData = {
+                    retailers: this.masterData.retailers.filter(item => item.cluster === userCluster),
+                    prospects: this.masterData.prospects.filter(item => item.cluster === userCluster),
+                    recruitment: this.masterData.recruitment.filter(item => item.cluster === userCluster),
+                    servicing: this.masterData.servicing.filter(item => item.cluster === userCluster)
+                };
+                
+                return filteredData;
+            },
+            
             // Populate locations dropdown
             populateLocations: function() {
                 const siteIdSelect = document.getElementById('siteId');
@@ -1830,85 +2091,6 @@
                     option.textContent = location;
                     siteIdSelect.appendChild(option);
                 });
-            },
-            
-            // Load sample data for demonstration
-            loadSampleData: function() {
-                // Sample retailers
-                this.data.retailers = [
-                    {
-                        msisdn: "254712345678",
-                        firstName: "John",
-                        lastName: "Kamau",
-                        businessName: "Kamau General Store",
-                        siteId: "NAIROBI_KASARANI",
-                        location: "Kasarani Market",
-                        lines: 3,
-                        visitationDate: "2024-01-15",
-                        visitationTime: "10:30",
-                        serial1: "SN123456",
-                        serial2: "SN789012",
-                        services: ["GA LM", "MTD"],
-                        status: "Active",
-                        addedBy: "System",
-                        addedDate: new Date().toISOString()
-                    }
-                ];
-                
-                // Sample prospects
-                this.data.prospects = [
-                    {
-                        phone: "254723456789",
-                        name: "Mary Wanjiku",
-                        business: "General Shop",
-                        location: "Mwiki Shopping Center",
-                        visitDate: "2024-01-20",
-                        followUpDate: "2024-01-27",
-                        interestLevel: "High",
-                        notes: "Interested in becoming an agent",
-                        status: "New",
-                        addedBy: "System",
-                        addedDate: new Date().toISOString()
-                    }
-                ];
-                
-                // Sample recruitment
-                this.data.recruitment = [
-                    {
-                        phone: "254734567890",
-                        name: "Peter Maina",
-                        business: "Kiosk",
-                        location: "Githurai 44",
-                        status: "Yes",
-                        recruitmentDate: "2024-01-18",
-                        notes: "Successfully recruited",
-                        addedBy: "System",
-                        addedDate: new Date().toISOString()
-                    }
-                ];
-                
-                // Sample servicing
-                this.data.servicing = [
-                    {
-                        retailer: "Kamau General Store",
-                        serviceType: "Float Top-up",
-                        amount: 5000,
-                        serviceDate: "2024-01-16",
-                        status: "Completed",
-                        description: "Regular float top-up",
-                        addedBy: "System",
-                        addedDate: new Date().toISOString()
-                    }
-                ];
-                
-                // Update tables if user is logged in
-                if (this.isLoggedIn) {
-                    this.updateRetailersTable();
-                    this.updateProspectsTable();
-                    this.updateRecruitmentTable();
-                    this.updateServicingTable();
-                    this.updateDashboardStats();
-                }
             },
             
             // Check if user is already logged in
@@ -1939,11 +2121,23 @@
                 // Simulate API call
                 setTimeout(() => {
                     // For demo purposes, accept any password
+                    // Determine role based on password pattern (in real app, this would be from backend)
+                    let role = 'DSR';
+                    let name = 'Field Agent';
+                    
+                    if (password.includes('tsm')) {
+                        role = 'TSM';
+                        name = 'Territory Manager';
+                    } else if (password.includes('manager')) {
+                        role = 'TSM';
+                        name = 'Territory Manager';
+                    }
+                    
                     const userData = {
-                        name: 'Field Agent',
-                        role: 'DSR',
+                        name: name,
+                        role: role,
                         territory: territory,
-                        avatar: 'FA'
+                        avatar: role === 'TSM' ? 'TM' : 'FA'
                     };
                     
                     this.loginUser(userData);
@@ -2022,9 +2216,9 @@
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
                 
-                this.showToast(`Welcome back, ${userData.name}!`, 'success');
+                this.showToast(`Welcome back, ${userData.name}! Accessing ${userData.territory} cluster`, 'success');
                 
-                // Initialize dashboard data
+                // Initialize dashboard data based on user role and cluster
                 this.updateDashboardStats();
                 this.updateRetailersTable();
                 this.updateProspectsTable();
@@ -2121,9 +2315,10 @@
                 retailer.addedBy = this.currentUser.name;
                 retailer.addedDate = new Date().toISOString();
                 retailer.status = 'Active';
+                retailer.cluster = this.userTerritory;
                 
-                // Add to data
-                this.data.retailers.push(retailer);
+                // Add to master data
+                this.masterData.retailers.push(retailer);
                 
                 // Show success message
                 this.showToast('Retailer saved successfully!', 'success');
@@ -2149,9 +2344,10 @@
                 prospect.addedBy = this.currentUser.name;
                 prospect.addedDate = new Date().toISOString();
                 prospect.status = 'New';
+                prospect.cluster = this.userTerritory;
                 
-                // Add to data
-                this.data.prospects.push(prospect);
+                // Add to master data
+                this.masterData.prospects.push(prospect);
                 
                 // Show success message
                 this.showToast('Prospect saved successfully!', 'success');
@@ -2175,9 +2371,10 @@
                 // Add metadata
                 recruitment.addedBy = this.currentUser.name;
                 recruitment.addedDate = new Date().toISOString();
+                recruitment.cluster = this.userTerritory;
                 
-                // Add to data
-                this.data.recruitment.push(recruitment);
+                // Add to master data
+                this.masterData.recruitment.push(recruitment);
                 
                 // Show success message
                 this.showToast('Recruitment saved successfully!', 'success');
@@ -2201,9 +2398,10 @@
                 // Add metadata
                 servicing.addedBy = this.currentUser.name;
                 servicing.addedDate = new Date().toISOString();
+                servicing.cluster = this.userTerritory;
                 
-                // Add to data
-                this.data.servicing.push(servicing);
+                // Add to master data
+                this.masterData.servicing.push(servicing);
                 
                 // Show success message
                 this.showToast('Servicing saved successfully!', 'success');
@@ -2224,7 +2422,9 @@
                 const tbody = document.getElementById('retailersTableBody');
                 tbody.innerHTML = '';
                 
-                this.data.retailers.forEach((retailer, index) => {
+                const userData = this.getUserData();
+                
+                userData.retailers.forEach((retailer, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${retailer.msisdn}</td>
@@ -2238,8 +2438,8 @@
                         <td>${retailer.services ? retailer.services.join(', ') : '-'}</td>
                         <td><span class="status-badge">${retailer.status}</span></td>
                         <td>
-                            <button class="btn btn-sm btn-outline" onclick="app.editRetailer(${index})">Edit</button>
-                            <button class="btn btn-sm btn-secondary" onclick="app.deleteRetailer(${index})">Delete</button>
+                            <button class="btn btn-sm btn-outline" onclick="app.editRetailer('${retailer.cluster}', ${index})">Edit</button>
+                            <button class="btn btn-sm btn-secondary" onclick="app.deleteRetailer('${retailer.cluster}', ${index})">Delete</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -2251,7 +2451,9 @@
                 const tbody = document.getElementById('prospectsTableBody');
                 tbody.innerHTML = '';
                 
-                this.data.prospects.forEach((prospect, index) => {
+                const userData = this.getUserData();
+                
+                userData.prospects.forEach((prospect, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${prospect.phone}</td>
@@ -2262,8 +2464,8 @@
                         <td><span class="status-badge">${prospect.status}</span></td>
                         <td>${prospect.followUpDate || 'No follow-up'}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline" onclick="app.editProspect(${index})">Edit</button>
-                            <button class="btn btn-sm btn-secondary" onclick="app.deleteProspect(${index})">Delete</button>
+                            <button class="btn btn-sm btn-outline" onclick="app.editProspect('${prospect.cluster}', ${index})">Edit</button>
+                            <button class="btn btn-sm btn-secondary" onclick="app.deleteProspect('${prospect.cluster}', ${index})">Delete</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -2275,7 +2477,9 @@
                 const tbody = document.getElementById('recruitmentTableBody');
                 tbody.innerHTML = '';
                 
-                this.data.recruitment.forEach((recruitment, index) => {
+                const userData = this.getUserData();
+                
+                userData.recruitment.forEach((recruitment, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${recruitment.phone}</td>
@@ -2286,8 +2490,8 @@
                         <td>${recruitment.recruitmentDate || '-'}</td>
                         <td>${recruitment.addedBy}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline" onclick="app.editRecruitment(${index})">Edit</button>
-                            <button class="btn btn-sm btn-secondary" onclick="app.deleteRecruitment(${index})">Delete</button>
+                            <button class="btn btn-sm btn-outline" onclick="app.editRecruitment('${recruitment.cluster}', ${index})">Edit</button>
+                            <button class="btn btn-sm btn-secondary" onclick="app.deleteRecruitment('${recruitment.cluster}', ${index})">Delete</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -2299,7 +2503,9 @@
                 const tbody = document.getElementById('servicingTableBody');
                 tbody.innerHTML = '';
                 
-                this.data.servicing.forEach((servicing, index) => {
+                const userData = this.getUserData();
+                
+                userData.servicing.forEach((servicing, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${servicing.retailer}</td>
@@ -2310,8 +2516,8 @@
                         <td>${servicing.description || '-'}</td>
                         <td>${servicing.addedBy}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline" onclick="app.editServicing(${index})">Edit</button>
-                            <button class="btn btn-sm btn-secondary" onclick="app.deleteServicing(${index})">Delete</button>
+                            <button class="btn btn-sm btn-outline" onclick="app.editServicing('${servicing.cluster}', ${index})">Edit</button>
+                            <button class="btn btn-sm btn-secondary" onclick="app.deleteServicing('${servicing.cluster}', ${index})">Delete</button>
                         </td>
                     `;
                     tbody.appendChild(row);
@@ -2323,7 +2529,9 @@
                 const select = document.getElementById('servicingRetailer');
                 select.innerHTML = '<option value="">Select Retailer</option>';
                 
-                this.data.retailers.forEach(retailer => {
+                const userData = this.getUserData();
+                
+                userData.retailers.forEach(retailer => {
                     const option = document.createElement('option');
                     option.value = `${retailer.firstName} ${retailer.lastName} - ${retailer.businessName || 'No Business Name'}`;
                     option.textContent = `${retailer.firstName} ${retailer.lastName} - ${retailer.businessName || 'No Business Name'}`;
@@ -2333,17 +2541,19 @@
             
             // Update dashboard statistics
             updateDashboardStats: function() {
-                document.getElementById('activeRetailers').textContent = this.data.retailers.length;
-                document.getElementById('totalProspects').textContent = this.data.prospects.length;
+                const userData = this.getUserData();
+                
+                document.getElementById('activeRetailers').textContent = userData.retailers.length;
+                document.getElementById('totalProspects').textContent = userData.prospects.length;
                 
                 // Calculate conversion rate (prospects converted to retailers)
-                const convertedProspects = this.data.prospects.filter(p => p.status === 'Converted').length;
-                const conversionRate = this.data.prospects.length > 0 ? 
-                    Math.round((convertedProspects / this.data.prospects.length) * 100) : 0;
+                const convertedProspects = userData.prospects.filter(p => p.status === 'Converted').length;
+                const conversionRate = userData.prospects.length > 0 ? 
+                    Math.round((convertedProspects / userData.prospects.length) * 100) : 0;
                 document.getElementById('conversionRate').textContent = conversionRate + '%';
                 
                 // Calculate target achievement (placeholder)
-                const targetAchievement = Math.min(100, Math.round((this.data.retailers.length / 50) * 100));
+                const targetAchievement = Math.min(100, Math.round((userData.retailers.length / 50) * 100));
                 document.getElementById('targetAchievement').textContent = targetAchievement + '%';
                 document.querySelector('.progress-fill').style.width = targetAchievement + '%';
                 
@@ -2356,24 +2566,26 @@
                 const activityList = document.getElementById('recentActivity');
                 activityList.innerHTML = '';
                 
+                const userData = this.getUserData();
+                
                 // Combine all activities and sort by date
                 const allActivities = [
-                    ...this.data.retailers.map(r => ({
+                    ...userData.retailers.map(r => ({
                         type: 'retailer',
                         text: `Added retailer: ${r.firstName} ${r.lastName}`,
                         time: new Date(r.addedDate)
                     })),
-                    ...this.data.prospects.map(p => ({
+                    ...userData.prospects.map(p => ({
                         type: 'prospect',
                         text: `Added prospect: ${p.name}`,
                         time: new Date(p.addedDate)
                     })),
-                    ...this.data.recruitment.map(r => ({
+                    ...userData.recruitment.map(r => ({
                         type: 'recruitment',
                         text: `Updated recruitment: ${r.name} - ${r.status}`,
                         time: new Date(r.addedDate)
                     })),
-                    ...this.data.servicing.map(s => ({
+                    ...userData.servicing.map(s => ({
                         type: 'servicing',
                         text: `Added servicing: ${s.serviceType} for ${s.retailer}`,
                         time: new Date(s.addedDate)
@@ -2445,57 +2657,90 @@
             },
             
             // Edit functions (placeholder implementations)
-            editRetailer: function(index) {
-                this.showToast(`Editing retailer ${index}...`, 'info');
+            editRetailer: function(cluster, index) {
+                this.showToast(`Editing retailer from ${cluster} cluster...`, 'info');
             },
             
-            editProspect: function(index) {
-                this.showToast(`Editing prospect ${index}...`, 'info');
+            editProspect: function(cluster, index) {
+                this.showToast(`Editing prospect from ${cluster} cluster...`, 'info');
             },
             
-            editRecruitment: function(index) {
-                this.showToast(`Editing recruitment ${index}...`, 'info');
+            editRecruitment: function(cluster, index) {
+                this.showToast(`Editing recruitment from ${cluster} cluster...`, 'info');
             },
             
-            editServicing: function(index) {
-                this.showToast(`Editing servicing ${index}...`, 'info');
+            editServicing: function(cluster, index) {
+                this.showToast(`Editing servicing from ${cluster} cluster...`, 'info');
             },
             
             // Delete functions
-            deleteRetailer: function(index) {
+            deleteRetailer: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this retailer?')) {
-                    this.data.retailers.splice(index, 1);
-                    this.updateRetailersTable();
-                    this.updateDashboardStats();
-                    this.populateRetailerDropdown();
-                    this.showToast('Retailer deleted successfully', 'success');
+                    // Find the actual index in master data
+                    const masterIndex = this.masterData.retailers.findIndex(item => 
+                        item.cluster === cluster && 
+                        this.getUserData().retailers[index].msisdn === item.msisdn
+                    );
+                    
+                    if (masterIndex !== -1) {
+                        this.masterData.retailers.splice(masterIndex, 1);
+                        this.updateRetailersTable();
+                        this.updateDashboardStats();
+                        this.populateRetailerDropdown();
+                        this.showToast('Retailer deleted successfully', 'success');
+                    }
                 }
             },
             
-            deleteProspect: function(index) {
+            deleteProspect: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this prospect?')) {
-                    this.data.prospects.splice(index, 1);
-                    this.updateProspectsTable();
-                    this.updateDashboardStats();
-                    this.showToast('Prospect deleted successfully', 'success');
+                    // Find the actual index in master data
+                    const masterIndex = this.masterData.prospects.findIndex(item => 
+                        item.cluster === cluster && 
+                        this.getUserData().prospects[index].phone === item.phone
+                    );
+                    
+                    if (masterIndex !== -1) {
+                        this.masterData.prospects.splice(masterIndex, 1);
+                        this.updateProspectsTable();
+                        this.updateDashboardStats();
+                        this.showToast('Prospect deleted successfully', 'success');
+                    }
                 }
             },
             
-            deleteRecruitment: function(index) {
+            deleteRecruitment: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this recruitment record?')) {
-                    this.data.recruitment.splice(index, 1);
-                    this.updateRecruitmentTable();
-                    this.updateDashboardStats();
-                    this.showToast('Recruitment record deleted successfully', 'success');
+                    // Find the actual index in master data
+                    const masterIndex = this.masterData.recruitment.findIndex(item => 
+                        item.cluster === cluster && 
+                        this.getUserData().recruitment[index].phone === item.phone
+                    );
+                    
+                    if (masterIndex !== -1) {
+                        this.masterData.recruitment.splice(masterIndex, 1);
+                        this.updateRecruitmentTable();
+                        this.updateDashboardStats();
+                        this.showToast('Recruitment record deleted successfully', 'success');
+                    }
                 }
             },
             
-            deleteServicing: function(index) {
+            deleteServicing: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this servicing record?')) {
-                    this.data.servicing.splice(index, 1);
-                    this.updateServicingTable();
-                    this.updateDashboardStats();
-                    this.showToast('Servicing record deleted successfully', 'success');
+                    // Find the actual index in master data
+                    const masterIndex = this.masterData.servicing.findIndex(item => 
+                        item.cluster === cluster && 
+                        this.getUserData().servicing[index].retailer === item.retailer &&
+                        this.getUserData().servicing[index].serviceDate === item.serviceDate
+                    );
+                    
+                    if (masterIndex !== -1) {
+                        this.masterData.servicing.splice(masterIndex, 1);
+                        this.updateServicingTable();
+                        this.updateDashboardStats();
+                        this.showToast('Servicing record deleted successfully', 'success');
+                    }
                 }
             },
             
