@@ -15,14 +15,16 @@ class RetailerPro {
         this.bindEvents();
         this.checkAuth();
         this.setDefaultDates();
-        // Initialize role change on page load
-        this.handleRoleChange({ target: document.getElementById('userRole') });
     }
 
     bindEvents() {
-        // Login form
+        // Login forms
         document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
-        document.getElementById('userRole').addEventListener('change', (e) => this.handleRoleChange(e));
+        document.getElementById('siboLoginForm').addEventListener('submit', (e) => this.handleSiboLogin(e));
+        
+        // SIBO login toggle
+        document.getElementById('siboLoginBtn').addEventListener('click', () => this.showSiboLogin());
+        document.getElementById('backToMainLogin').addEventListener('click', () => this.showMainLogin());
         
         // Navigation
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -80,32 +82,58 @@ class RetailerPro {
         }
     }
 
-    handleRoleChange(e) {
-        const role = e.target.value;
-        const clusterGroup = document.getElementById('clusterGroup');
-        const siboPasswordGroup = document.getElementById('siboPasswordGroup');
+    showSiboLogin() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('siboLoginBtn').style.display = 'none';
+        document.getElementById('siboLoginForm').style.display = 'block';
+    }
+
+    showMainLogin() {
+        document.getElementById('siboLoginForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('siboLoginBtn').style.display = 'block';
+    }
+
+    async handleSiboLogin(e) {
+        e.preventDefault();
         
-        // Show cluster selection for DSR and TSM roles
-        if (role === 'DSR' || role === 'TSM') {
-            clusterGroup.style.display = 'block';
-            siboPasswordGroup.style.display = 'none';
-        } else if (role === 'SIBO_AGENCY') {
-            clusterGroup.style.display = 'none';
-            siboPasswordGroup.style.display = 'block';
+        const formData = new FormData(e.target);
+        const siboPassword = formData.get('siboPassword');
+
+        // Show loading state
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const btnText = submitBtn.querySelector('.btn-text');
+        
+        btnText.textContent = 'Authenticating...';
+
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        if (siboPassword === 'SIBO25') {
+            this.currentUser = {
+                role: 'SIBO_AGENCY',
+                name: 'SIBO Agency Admin',
+                cluster: 'ALL',
+                isAuthenticated: true,
+                loginTime: new Date().toISOString()
+            };
+
+            localStorage.setItem('retailerpro_user', JSON.stringify(this.currentUser));
+            this.showApp();
+            this.showToast('Welcome SIBO Agency Admin!', 'success');
         } else {
-            clusterGroup.style.display = 'none';
-            siboPasswordGroup.style.display = 'none';
+            this.showToast('Invalid SIBO password. Please contact administrator.', 'error');
         }
+        
+        btnText.textContent = 'Login as SIBO';
     }
 
     async handleLogin(e) {
         e.preventDefault();
         
         const formData = new FormData(e.target);
-        const phoneNumber = formData.get('phoneNumber');
-        const userRole = formData.get('userRole');
+        const password = formData.get('password');
         const userCluster = formData.get('userCluster');
-        const siboPassword = formData.get('siboPassword');
 
         // Show loading state
         const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -118,24 +146,8 @@ class RetailerPro {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // Validate credentials based on role
-        if (userRole === 'SIBO_AGENCY') {
-            if (siboPassword !== 'SIBO25') {
-                this.showToast('Invalid SIBO password. Please contact administrator.', 'error');
-                btnText.style.display = 'inline';
-                btnLoader.style.display = 'none';
-                return;
-            }
-            
-            this.currentUser = {
-                phoneNumber,
-                role: userRole,
-                name: 'SIBO Agency Admin',
-                cluster: 'ALL',
-                isAuthenticated: true,
-                loginTime: new Date().toISOString()
-            };
-        } else if (userRole === 'DSR' || userRole === 'TSM') {
+        // Validate credentials
+        if (password === 'DSR2024') {
             if (!userCluster) {
                 this.showToast('Please select your territory/cluster.', 'error');
                 btnText.style.display = 'inline';
@@ -144,15 +156,29 @@ class RetailerPro {
             }
             
             this.currentUser = {
-                phoneNumber,
-                role: userRole,
-                name: userRole === 'DSR' ? 'Field Sales Representative' : 'Territory Sales Manager',
+                role: 'DSR',
+                name: `Field Representative (${userCluster})`,
+                cluster: userCluster,
+                isAuthenticated: true,
+                loginTime: new Date().toISOString()
+            };
+        } else if (password === 'TSM2024') {
+            if (!userCluster) {
+                this.showToast('Please select your territory/cluster.', 'error');
+                btnText.style.display = 'inline';
+                btnLoader.style.display = 'none';
+                return;
+            }
+            
+            this.currentUser = {
+                role: 'TSM',
+                name: `Territory Manager (${userCluster})`,
                 cluster: userCluster,
                 isAuthenticated: true,
                 loginTime: new Date().toISOString()
             };
         } else {
-            this.showToast('Please select a valid role.', 'error');
+            this.showToast('Invalid password. Please try again.', 'error');
             btnText.style.display = 'inline';
             btnLoader.style.display = 'none';
             return;
@@ -177,6 +203,7 @@ class RetailerPro {
     showLogin() {
         document.getElementById('loginSection').style.display = 'flex';
         document.getElementById('appSection').style.display = 'none';
+        this.showMainLogin(); // Reset to main login form
     }
 
     showApp() {
@@ -198,6 +225,7 @@ class RetailerPro {
         document.getElementById('userRoleBadge').textContent = this.getRoleDisplayName(this.currentUser.role);
         document.getElementById('userAvatar').textContent = this.currentUser.name.charAt(0);
 
+        // Show/hide management section based on role
         const managementSection = document.getElementById('managementSection');
         if (this.currentUser.role === 'TSM' || this.currentUser.role === 'SIBO_AGENCY') {
             managementSection.style.display = 'block';
@@ -205,14 +233,18 @@ class RetailerPro {
             managementSection.style.display = 'none';
         }
 
+        // Update territory badge
         const territoryBadge = document.getElementById('territoryBadge');
         const territoryName = document.getElementById('territoryName');
         
         if (this.currentUser.cluster && this.currentUser.cluster !== 'ALL') {
             territoryBadge.style.display = 'flex';
             territoryName.textContent = this.currentUser.cluster;
+        } else {
+            territoryBadge.style.display = 'none';
         }
 
+        // Show/hide DSR fields
         if (this.currentUser.role === 'DSR') {
             document.body.classList.add('user-dsr');
         } else {
@@ -235,6 +267,7 @@ class RetailerPro {
         const tab = e.currentTarget.getAttribute('data-tab');
         this.showTab(tab);
         
+        // Update active nav item
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
@@ -242,14 +275,17 @@ class RetailerPro {
     }
 
     showTab(tabId) {
+        // Hide all tabs
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
         });
 
+        // Show selected tab
         const targetTab = document.getElementById(tabId);
         if (targetTab) {
             targetTab.classList.add('active');
             
+            // Update page title
             const pageTitle = document.getElementById('pageTitle');
             const pageSubtitle = document.getElementById('pageSubtitle');
             
@@ -308,8 +344,7 @@ class RetailerPro {
             qsso: formData.get('qsso') === 'on',
             qama: formData.get('qama') === 'on',
             kcb_agent: formData.get('kcb_agent') === 'on',
-            addedBy: this.currentUser.phoneNumber,
-            addedByName: this.currentUser.name,
+            addedBy: this.currentUser.name,
             territory: this.currentUser.cluster,
             status: 'Active',
             createdAt: new Date().toISOString(),
@@ -406,8 +441,7 @@ class RetailerPro {
             followUpDate: formData.get('followUpDate'),
             interestLevel: formData.get('interestLevel'),
             notes: formData.get('prospectNotes'),
-            addedBy: this.currentUser.phoneNumber,
-            addedByName: this.currentUser.name,
+            addedBy: this.currentUser.name,
             territory: this.currentUser.cluster,
             status: 'New',
             createdAt: new Date().toISOString(),
@@ -514,8 +548,7 @@ class RetailerPro {
             status: formData.get('recruitmentStatus'),
             recruitmentDate: formData.get('recruitmentDate'),
             notes: formData.get('recruitmentNotes'),
-            addedBy: this.currentUser.phoneNumber,
-            addedByName: this.currentUser.name,
+            addedBy: this.currentUser.name,
             territory: this.currentUser.cluster,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -555,7 +588,7 @@ class RetailerPro {
                 <td>${recruitment.location}</td>
                 <td><span class="status-badge">${recruitment.status}</span></td>
                 <td>${recruitment.recruitmentDate ? this.formatDate(recruitment.recruitmentDate) : '-'}</td>
-                <td>${recruitment.addedByName}</td>
+                <td>${recruitment.addedBy}</td>
             </tr>
         `).join('');
     }
@@ -623,8 +656,7 @@ class RetailerPro {
             serviceDate: formData.get('servicingDate'),
             status: formData.get('servicingStatus'),
             description: formData.get('servicingDescription'),
-            addedBy: this.currentUser.phoneNumber,
-            addedByName: this.currentUser.name,
+            addedBy: this.currentUser.name,
             territory: this.currentUser.cluster,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -664,7 +696,7 @@ class RetailerPro {
                 <td>${servicing.serviceDate ? this.formatDate(servicing.serviceDate) : '-'}</td>
                 <td><span class="status-badge">${servicing.status}</span></td>
                 <td>${servicing.description || '-'}</td>
-                <td>${servicing.addedByName}</td>
+                <td>${servicing.addedBy}</td>
             </tr>
         `).join('');
     }

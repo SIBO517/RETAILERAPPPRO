@@ -23,7 +23,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230369a1' rx='20'/><text x='50' y='65' font-family='Arial' font-size='45' text-anchor='middle' fill='white'>RP</text></svg>">
 </head>
 <body>
-    <!-- Login Section -->
+        <!-- Login Section -->
     <div id="loginSection" class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -34,28 +34,18 @@
                 <p class="login-subtitle">Enterprise Retail Management Platform</p>
             </div>
             
+            <!-- DSR/TSM Login Form -->
             <form id="loginForm" class="login-form">
                 <div class="form-group">
-                    <label for="phoneNumber">Phone Number *</label>
-                    <input type="tel" id="phoneNumber" name="phoneNumber" required 
-                           placeholder="254712345678" value="784478620">
-                </div>
-                
-                <div class="form-group">
-                    <label for="userRole">Role *</label>
-                    <select id="userRole" name="userRole" required>
-                        <option value="">Select Role</option>
-                        <option value="DSR" selected>Field Sales Representative</option>
-                        <option value="TSM">Territory Sales Manager</option>
-                        <option value="SIBO_AGENCY">SIBO Agency</option>
-                    </select>
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter DSR/TSM password">
                 </div>
 
-                <div class="form-group" id="clusterGroup" style="display: none;">
+                <div class="form-group">
                     <label for="userCluster">Territory/Cluster *</label>
                     <select id="userCluster" name="userCluster" required>
                         <option value="">Select Territory</option>
-                        <option value="KASARANI" selected>Kasarani</option>
+                        <option value="KASARANI">Kasarani</option>
                         <option value="MWIKI">Mwiki</option>
                         <option value="ZIMMERMAN">Zimmerman</option>
                         <option value="GITHURAI">Githurai</option>
@@ -66,39 +56,39 @@
                         <option value="KAHAWA">Kahawa</option>
                     </select>
                 </div>
-
-                <div class="form-group" id="siboPasswordGroup" style="display: none;">
-                    <label for="siboPassword">SIBO Password *</label>
-                    <input type="password" id="siboPassword" name="siboPassword" 
-                           placeholder="Enter SIBO password" required>
-                </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">
                     <span class="btn-text">Access Platform</span>
                     <span class="btn-loader" style="display: none;"></span>
                 </button>
             </form>
-            
-            <div class="login-footer" style="display: none;">
-                <!-- Demo and install instructions hidden -->
+
+            <!-- SIBO Agency Login Button -->
+            <div style="text-align: center; margin-top: 1rem;">
+                <button id="siboLoginBtn" class="btn btn-outline btn-sm">
+                    <span class="btn-icon">🔐</span>
+                    SIBO Agency Login
+                </button>
             </div>
+
+            <!-- SIBO Agency Login Form (Hidden by default) -->
+            <form id="siboLoginForm" class="login-form" style="display: none;">
+                <div class="form-group">
+                    <label for="siboPassword">SIBO Password *</label>
+                    <input type="password" id="siboPassword" name="siboPassword" required placeholder="Enter SIBO Agency password">
+                </div>
+                
+                <div class="form-actions" style="display: flex; gap: 0.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        <span class="btn-text">Login as SIBO</span>
+                    </button>
+                    <button type="button" id="backToMainLogin" class="btn btn-secondary">
+                        Back
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-
-    <!-- Main Application -->
-    <div id="appSection" class="app-container" style="display: none;">
-        <!-- Navigation Sidebar -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <div class="logo-icon">RP</div>
-                    <div class="logo-text">
-                        <h2>RetailerPro</h2>
-                        <span class="logo-subtitle">Enterprise</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="sidebar-content">
                 <div class="nav-section">
                     <h3 class="nav-section-title">CORE</h3>
