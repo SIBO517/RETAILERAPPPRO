@@ -1,22 +1,15 @@
-// RetailerPro Service Worker
-const CACHE_NAME = 'retailerpro-v1.0';
-const urlsToCache = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json'
+// Minimal service worker: basic cache-first for installability
+const CACHE_NAME = 'retailerpro-v1';
+const ASSETS = [
+  '.',
+  'index.html',
+  'manifest.json'
+  // add other static assets like CSS/images if present
 ];
 
-// Install event
-self.addEventListener('install', (event) => {
-  console.log('Service Worker installing');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+self.addEventListener('install', (evt) => {
+  evt.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
   self.skipWaiting();
 });

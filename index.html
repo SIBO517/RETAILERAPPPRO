@@ -929,6 +929,8 @@
             }
         }
     </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0369a1">
 </head>
 <body>
     <!-- Login Section (Visible by default) -->
@@ -1034,6 +1036,14 @@
                                 <span class="nav-icon">🔄</span>
                                 <span class="nav-text">Servicing Float</span>
                             </a>
+                        </div>
+                    </div>
+
+                    <!-- Clusters Section (populated dynamically) -->
+                    <div class="nav-section" id="clustersSection" style="display: none;">
+                        <h3 class="nav-section-title">CLUSTERS</h3>
+                        <div class="nav-items" id="clustersList">
+                            <!-- cluster links inserted here -->
                         </div>
                     </div>
 
@@ -1246,14 +1256,14 @@
                                         <input type="time" id="visitationTime" name="visitationTime" required>
                                     </div>
                                     <div class="form-group dsr-field">
-                                        <label for="serial1">Device Serial 1</label>
+                                        <label for="serial1">SIM Serial 1</label>
                                         <input type="text" id="serial1" name="serial1" 
-                                               placeholder="Enter device serial number">
+                                               placeholder="Enter SIM serial number">
                                     </div>
                                     <div class="form-group dsr-field">
-                                        <label for="serial2">Device Serial 2</label>
+                                        <label for="serial2">SIM Serial 2</label>
                                         <input type="text" id="serial2" name="serial2" 
-                                               placeholder="Enter device serial number">
+                                               placeholder="Enter SIM serial number">
                                     </div>
                                     <div class="form-group full-width">
                                         <label>Services & Programs</label>
@@ -1725,7 +1735,8 @@
             userRole: null,
             userTerritory: null,
             isLoggedIn: false,
-            
+            viewCluster: null, // cluster currently selected for viewing by SIBO
+
             // Master data storage with cluster information
             masterData: {
                 retailers: [],
@@ -1733,7 +1744,7 @@
                 recruitment: [],
                 servicing: []
             },
-            
+
             // Sample data for all clusters
             sampleData: {
                 KASARANI: {
@@ -1932,7 +1943,7 @@
                     ]
                 }
             },
-            
+
             locations: [
                 "NAIROBI_KAYOLE_JUAKALI", "NAIROBI_USIU", "NAIROBI_MIREMA_TREAT", "NAIROBI_KASARANI_SPORTS_VIEW",
                 "NAIROBI_ST.FRANCIS_HOSPITAL", "NAIROBI_ATHI_MARKET", "NAIROBI_MIREMA_DRIVE", "NAIROBI_RUAI_PCEA",
@@ -1959,15 +1970,16 @@
                 "NAIROBI_MURERA_KASARANI", "NAIROBI_CLARETT_THOME", "NAIROBI_SPORTS_VIEW_KASARANI", "NAIROBI_KAMULU_KASARANI_TECHNICAL",
                 "NAIROBI_KENYATTA_UNIVERSITY", "NAIROBI_GARDEN_ESTATE_ROAD", "NAIROBI_KASARANI_CLAYWORKS"
             ],
-            
+
             // Initialize the application
             init: function() {
                 this.bindEvents();
+                this.loadMasterData(); // load persisted masterData or initialize from sampleData
                 this.checkAuthState();
                 this.populateLocations();
-                this.initializeMasterData();
+                this.populateClustersList(); // populate sidebar clusters links
             },
-            
+
             // Bind event listeners
             bindEvents: function() {
                 // Login form submission
@@ -1975,28 +1987,28 @@
                     e.preventDefault();
                     this.handleLogin();
                 });
-                
+
                 // SIBO login form submission
                 document.getElementById('siboLoginForm').addEventListener('submit', (e) => {
                     e.preventDefault();
                     this.handleSiboLogin();
                 });
-                
+
                 // SIBO login button
                 document.getElementById('siboLoginBtn').addEventListener('click', () => {
                     this.toggleSiboLogin();
                 });
-                
+
                 // Back to main login
                 document.getElementById('backToMainLogin').addEventListener('click', () => {
                     this.toggleSiboLogin();
                 });
-                
+
                 // Logout button
                 document.getElementById('logoutBtn').addEventListener('click', () => {
                     this.handleLogout();
                 });
-                
+
                 // Navigation
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.addEventListener('click', (e) => {
@@ -2005,7 +2017,7 @@
                         this.showTab(tabId);
                     });
                 });
-                
+
                 // Retailer form events
                 document.getElementById('addRetailerBtn').addEventListener('click', () => {
                     this.toggleForm('retailer');
@@ -2020,7 +2032,7 @@
                 document.getElementById('clearRetailerForm').addEventListener('click', () => {
                     document.getElementById('retailerForm').reset();
                 });
-                
+
                 // Prospect form events
                 document.getElementById('addProspectBtn').addEventListener('click', () => {
                     this.toggleForm('prospect');
@@ -2093,7 +2105,87 @@
                     this.updatePerformanceData(e.target.value);
                 });
             },
-            
+
+            // Load persisted masterData or initialize from sampleData
+            loadMasterData: function() {
+                try {
+                    const stored = localStorage.getItem('retailerProMasterData');
+                    if (stored) {
+                        this.masterData = JSON.parse(stored);
+                    } else {
+                        // initialize from sample data
+                        this.initializeMasterData();
+                        this.saveMasterData();
+                    }
+                } catch (err) {
+                    console.error('Failed to load master data', err);
+                    this.initializeMasterData();
+                    this.saveMasterData();
+                }
+            },
+
+            // Persist master data to localStorage
+            saveMasterData: function() {
+                try {
+                    localStorage.setItem('retailerProMasterData', JSON.stringify(this.masterData));
+                } catch (err) {
+                    console.error('Failed to save master data', err);
+                }
+            },
+
+            // Populate clusters list in sidebar
+            populateClustersList: function() {
+                const clustersList = document.getElementById('clustersList');
+                clustersList.innerHTML = '';
+
+                // get clusters from sampleData keys and any existing masterData entries
+                const clustersFromSample = Object.keys(this.sampleData || {});
+                const clustersFromMaster = [
+                    ...new Set([
+                        ...this.masterData.retailers.map(r => r.cluster),
+                        ...this.masterData.prospects.map(p => p.cluster),
+                        ...this.masterData.recruitment.map(r => r.cluster),
+                        ...this.masterData.servicing.map(s => s.cluster)
+                    ].filter(Boolean))
+                ];
+                const clusters = Array.from(new Set([...clustersFromSample, ...clustersFromMaster])).filter(Boolean);
+
+                clusters.forEach(cluster => {
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'nav-item';
+                    a.textContent = cluster;
+                    a.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.onClusterClick(cluster);
+                    });
+                    clustersList.appendChild(a);
+                });
+            },
+
+            // Called when a cluster is clicked in the sidebar
+            onClusterClick: function(cluster) {
+                if (this.userRole !== 'SIBO') {
+                    this.showToast('Cluster-level views are available to SIBO only', 'warning');
+                    return;
+                }
+
+                // set view cluster and update UI
+                this.viewCluster = cluster;
+                document.getElementById('territoryName').textContent = `Viewing: ${cluster}`;
+                this.showToast(`Viewing data for ${cluster}`, 'info');
+
+                // refresh views for selected cluster
+                this.updateRetailersTable();
+                this.updateProspectsTable();
+                this.updateRecruitmentTable();
+                this.updateServicingTable();
+
+                // open reports/performance so SIBO sees analytics for the cluster
+                this.showTab('performance-tab');
+                this.updatePerformanceData('month');
+            },
+
             // Initialize master data with sample data for all clusters
             initializeMasterData: function() {
                 // Clear existing data
@@ -2103,45 +2195,55 @@
                     recruitment: [],
                     servicing: []
                 };
-                
+
                 // Load sample data for all clusters
                 Object.keys(this.sampleData).forEach(cluster => {
                     const clusterData = this.sampleData[cluster];
-                    
+
                     // Add retailers
                     clusterData.retailers.forEach(retailer => {
                         this.masterData.retailers.push(retailer);
                     });
-                    
+
                     // Add prospects
                     clusterData.prospects.forEach(prospect => {
                         this.masterData.prospects.push(prospect);
                     });
-                    
+
                     // Add recruitment
                     clusterData.recruitment.forEach(recruitment => {
                         this.masterData.recruitment.push(recruitment);
                     });
-                    
+
                     // Add servicing
                     clusterData.servicing.forEach(servicing => {
                         this.masterData.servicing.push(servicing);
                     });
                 });
             },
-            
+
             // Get data based on user role and cluster
             getUserData: function() {
                 if (!this.currentUser) return { retailers: [], prospects: [], recruitment: [], servicing: [] };
-                
+
                 const userCluster = this.userTerritory;
                 const userRole = this.userRole;
-                
-                // SIBO can access all data
+
+                // SIBO can access all data by default
                 if (userRole === 'SIBO') {
+                    // if SIBO has selected a specific cluster view, return only that cluster's data
+                    if (this.viewCluster) {
+                        const cluster = this.viewCluster;
+                        return {
+                            retailers: this.masterData.retailers.filter(item => item.cluster === cluster),
+                            prospects: this.masterData.prospects.filter(item => item.cluster === cluster),
+                            recruitment: this.masterData.recruitment.filter(item => item.cluster === cluster),
+                            servicing: this.masterData.servicing.filter(item => item.cluster === cluster)
+                        };
+                    }
                     return this.masterData;
                 }
-                
+
                 // TSM and DSR can only access their cluster data
                 const filteredData = {
                     retailers: this.masterData.retailers.filter(item => item.cluster === userCluster),
@@ -2149,10 +2251,10 @@
                     recruitment: this.masterData.recruitment.filter(item => item.cluster === userCluster),
                     servicing: this.masterData.servicing.filter(item => item.cluster === userCluster)
                 };
-                
+
                 return filteredData;
             },
-            
+
             // Populate locations dropdown
             populateLocations: function() {
                 const siteIdSelect = document.getElementById('siteId');
@@ -2163,7 +2265,7 @@
                     siteIdSelect.appendChild(option);
                 });
             },
-            
+
             // Check if user is already logged in
             checkAuthState: function() {
                 const savedUser = localStorage.getItem('retailerProUser');
@@ -2172,30 +2274,30 @@
                     this.loginUser(userData);
                 }
             },
-            
+
             // Handle DSR/TSM login
             handleLogin: function() {
                 const password = document.getElementById('password').value;
                 const territory = document.getElementById('userCluster').value;
-                
+
                 if (!password || !territory) {
                     this.showToast('Please fill in all required fields', 'error');
                     return;
                 }
-                
+
                 // Show loading state
                 const submitBtn = document.querySelector('#loginForm .btn-text');
                 const loader = document.querySelector('#loginForm .btn-loader');
                 submitBtn.style.display = 'none';
                 loader.style.display = 'block';
-                
+
                 // Simulate API call
                 setTimeout(() => {
                     // For demo purposes, accept any password
                     // Determine role based on password pattern (in real app, this would be from backend)
                     let role = 'DSR';
                     let name = 'Field Agent';
-                    
+
                     if (password.includes('tsm')) {
                         role = 'TSM';
                         name = 'Territory Manager';
@@ -2203,31 +2305,31 @@
                         role = 'TSM';
                         name = 'Territory Manager';
                     }
-                    
+
                     const userData = {
                         name: name,
                         role: role,
                         territory: territory,
                         avatar: role === 'TSM' ? 'TM' : 'FA'
                     };
-                    
+
                     this.loginUser(userData);
-                    
+
                     // Reset button
                     submitBtn.style.display = 'block';
                     loader.style.display = 'none';
                 }, 1500);
             },
-            
+
             // Handle SIBO login
             handleSiboLogin: function() {
                 const password = document.getElementById('siboPassword').value;
-                
+
                 if (!password) {
                     this.showToast('Please enter SIBO password', 'error');
                     return;
                 }
-                
+
                 // Simulate API call
                 setTimeout(() => {
                     // For demo purposes, accept any password
@@ -2237,17 +2339,17 @@
                         territory: 'All Territories',
                         avatar: 'SA'
                     };
-                    
+
                     this.loginUser(userData);
                 }, 1500);
             },
-            
+
             // Toggle between main login and SIBO login
             toggleSiboLogin: function() {
                 const mainForm = document.getElementById('loginForm');
                 const siboForm = document.getElementById('siboLoginForm');
                 const siboBtn = document.getElementById('siboLoginBtn');
-                
+
                 if (mainForm.style.display !== 'none') {
                     mainForm.style.display = 'none';
                     siboForm.style.display = 'block';
@@ -2258,37 +2360,46 @@
                     siboBtn.style.display = 'block';
                 }
             },
-            
+
             // Login user and show dashboard
             loginUser: function(userData) {
                 this.currentUser = userData;
                 this.userRole = userData.role;
                 this.userTerritory = userData.territory;
                 this.isLoggedIn = true;
-                
+                this.viewCluster = null; // reset any previous cluster view
+
                 // Save to localStorage
                 localStorage.setItem('retailerProUser', JSON.stringify(userData));
-                
+
                 // Update UI
                 document.getElementById('userName').textContent = userData.name;
                 document.getElementById('userRoleBadge').textContent = userData.role;
                 document.getElementById('userAvatar').textContent = userData.avatar;
                 document.getElementById('territoryName').textContent = userData.territory;
-                
+
                 // Show management section for TSM/SIBO users
                 if (userData.role === 'TSM' || userData.role === 'SIBO') {
                     document.getElementById('managementSection').style.display = 'block';
                 }
-                
+
+                // Show clusters section only for SIBO
+                if (userData.role === 'SIBO') {
+                    document.getElementById('clustersSection').style.display = 'block';
+                    this.populateClustersList();
+                } else {
+                    document.getElementById('clustersSection').style.display = 'none';
+                }
+
                 // Show territory badge
                 document.getElementById('territoryBadge').style.display = 'flex';
-                
+
                 // Switch to app view
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
-                
+
                 this.showToast(`Welcome back, ${userData.name}! Accessing ${userData.territory} cluster`, 'success');
-                
+
                 // Initialize dashboard data based on user role and cluster
                 this.updateDashboardStats();
                 this.updateRetailersTable();
@@ -2296,49 +2407,51 @@
                 this.updateRecruitmentTable();
                 this.updateServicingTable();
                 this.populateRetailerDropdown();
-                
+
                 // Initialize SIBO-specific features
                 if (userData.role === 'SIBO') {
                     this.initializeSIBOFeatures();
                 }
             },
-            
+
             // Initialize SIBO-specific features
             initializeSIBOFeatures: function() {
                 this.updatePerformanceData('month');
                 this.initializeReports();
             },
-            
+
             // Handle logout
             handleLogout: function() {
                 this.currentUser = null;
                 this.userRole = null;
                 this.userTerritory = null;
                 this.isLoggedIn = false;
-                
-                // Clear localStorage
+                this.viewCluster = null;
+
+                // Clear localStorage (keep masterData persisted so data does not disappear)
                 localStorage.removeItem('retailerProUser');
-                
+
                 // Reset forms
                 document.getElementById('loginForm').reset();
                 document.getElementById('siboLoginForm').reset();
-                
+
                 // Hide management section
                 document.getElementById('managementSection').style.display = 'none';
-                
+                document.getElementById('clustersSection').style.display = 'none';
+
                 // Hide territory badge
                 document.getElementById('territoryBadge').style.display = 'none';
-                
+
                 // Switch to login view
                 document.getElementById('appContainer').style.display = 'none';
                 document.getElementById('loginSection').style.display = 'flex';
-                
+
                 // Reset SIBO login view if active
                 this.toggleSiboLogin();
-                
+
                 this.showToast('You have been logged out', 'info');
             },
-            
+
             // Show specific tab
             showTab: function(tabId) {
                 // Hide all tabs
@@ -2352,10 +2465,12 @@
                 });
                 
                 // Show selected tab
-                document.getElementById(tabId).classList.add('active');
+                const el = document.getElementById(tabId);
+                if (el) el.classList.add('active');
                 
                 // Activate corresponding nav item
-                document.querySelector(`.nav-item[data-tab="${tabId}"]`).classList.add('active');
+                const navItem = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+                if (navItem) navItem.classList.add('active');
                 
                 // Update page title
                 const tabTitles = {
@@ -2394,140 +2509,177 @@
             saveRetailer: function() {
                 const formData = new FormData(document.getElementById('retailerForm'));
                 const retailer = Object.fromEntries(formData);
-                
+
                 // Get checked services
                 const services = [];
                 document.querySelectorAll('#retailerForm input[type="checkbox"]:checked').forEach(checkbox => {
                     services.push(checkbox.name);
                 });
                 retailer.services = services;
-                
+
                 // Add metadata
                 retailer.addedBy = this.currentUser.name;
                 retailer.addedDate = new Date().toISOString();
                 retailer.status = 'Active';
-                retailer.cluster = this.userTerritory;
-                
+
+                // If SIBO and viewing a specific cluster, assign to viewCluster, else assign user's territory
+                if (this.userRole === 'SIBO' && this.viewCluster) {
+                    retailer.cluster = this.viewCluster;
+                } else {
+                    retailer.cluster = this.userTerritory;
+                }
+
                 // Add to master data
                 this.masterData.retailers.push(retailer);
-                
+
+                // Persist master data
+                this.saveMasterData();
+
                 // Show success message
                 this.showToast('Retailer saved successfully!', 'success');
-                
+
                 // Hide form
                 this.toggleForm('retailer');
-                
+
                 // Reset form
                 document.getElementById('retailerForm').reset();
-                
+
                 // Update tables
                 this.updateRetailersTable();
                 this.updateDashboardStats();
                 this.populateRetailerDropdown();
+                this.populateClustersList();
             },
-            
+
             // Save prospect data
             saveProspect: function() {
                 const formData = new FormData(document.getElementById('prospectForm'));
                 const prospect = Object.fromEntries(formData);
-                
+
                 // Add metadata
                 prospect.addedBy = this.currentUser.name;
                 prospect.addedDate = new Date().toISOString();
                 prospect.status = 'New';
-                prospect.cluster = this.userTerritory;
-                
+
+                if (this.userRole === 'SIBO' && this.viewCluster) {
+                    prospect.cluster = this.viewCluster;
+                } else {
+                    prospect.cluster = this.userTerritory;
+                }
+
                 // Add to master data
                 this.masterData.prospects.push(prospect);
-                
+
+                // Persist master data
+                this.saveMasterData();
+
                 // Show success message
                 this.showToast('Prospect saved successfully!', 'success');
-                
+
                 // Hide form
                 this.toggleForm('prospect');
-                
+
                 // Reset form
                 document.getElementById('prospectForm').reset();
-                
+
                 // Update tables
                 this.updateProspectsTable();
                 this.updateDashboardStats();
+                this.populateClustersList();
             },
-            
+
             // Save recruitment data
             saveRecruitment: function() {
                 const formData = new FormData(document.getElementById('recruitmentForm'));
                 const recruitment = Object.fromEntries(formData);
-                
+
                 // Add metadata
                 recruitment.addedBy = this.currentUser.name;
                 recruitment.addedDate = new Date().toISOString();
-                recruitment.cluster = this.userTerritory;
-                
+
+                if (this.userRole === 'SIBO' && this.viewCluster) {
+                    recruitment.cluster = this.viewCluster;
+                } else {
+                    recruitment.cluster = this.userTerritory;
+                }
+
                 // Add to master data
                 this.masterData.recruitment.push(recruitment);
-                
+
+                // Persist master data
+                this.saveMasterData();
+
                 // Show success message
                 this.showToast('Recruitment saved successfully!', 'success');
-                
+
                 // Hide form
                 this.toggleForm('recruitment');
-                
+
                 // Reset form
                 document.getElementById('recruitmentForm').reset();
-                
+
                 // Update tables
                 this.updateRecruitmentTable();
                 this.updateDashboardStats();
+                this.populateClustersList();
             },
-            
+
             // Save servicing data
             saveServicing: function() {
                 const formData = new FormData(document.getElementById('servicingForm'));
                 const servicing = Object.fromEntries(formData);
-                
+
                 // Add metadata
                 servicing.addedBy = this.currentUser.name;
                 servicing.addedDate = new Date().toISOString();
-                servicing.cluster = this.userTerritory;
-                
+
+                if (this.userRole === 'SIBO' && this.viewCluster) {
+                    servicing.cluster = this.viewCluster;
+                } else {
+                    servicing.cluster = this.userTerritory;
+                }
+
                 // Add to master data
                 this.masterData.servicing.push(servicing);
-                
+
+                // Persist master data
+                this.saveMasterData();
+
                 // Show success message
                 this.showToast('Servicing saved successfully!', 'success');
-                
+
                 // Hide form
                 this.toggleForm('servicing');
-                
+
                 // Reset form
                 document.getElementById('servicingForm').reset();
-                
+
                 // Update tables
                 this.updateServicingTable();
                 this.updateDashboardStats();
+                this.populateClustersList();
             },
-            
+
             // Update retailers table
             updateRetailersTable: function() {
                 const tbody = document.getElementById('retailersTableBody');
                 tbody.innerHTML = '';
-                
+
                 const userData = this.getUserData();
-                
+
                 userData.retailers.forEach((retailer, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${retailer.msisdn}</td>
-                        <td>${retailer.firstName} ${retailer.lastName}</td>
+                        <td>${retailer.msisdn || '-'}</td>
+                        <td>${retailer.firstName || '-'} ${retailer.lastName || ''}</td>
                         <td>${retailer.businessName || '-'}</td>
-                        <td>${retailer.siteId}</td>
+                        <td>${retailer.siteId || '-'}</td>
                         <td>${retailer.location || '-'}</td>
                         <td>${retailer.lines || '0'}</td>
-                        <td>${retailer.visitationDate}</td>
-                        <td>${retailer.visitationTime}</td>
+                        <td>${retailer.visitationDate || '-'}</td>
+                        <td>${retailer.visitationTime || '-'}</td>
                         <td>${retailer.services ? retailer.services.join(', ') : '-'}</td>
-                        <td><span class="status-badge">${retailer.status}</span></td>
+                        <td><span class="status-badge">${retailer.status || '-'}</span></td>
                         <td>
                             <button class="btn btn-sm btn-outline" onclick="app.editRetailer('${retailer.cluster}', ${index})">Edit</button>
                             <button class="btn btn-sm btn-secondary" onclick="app.deleteRetailer('${retailer.cluster}', ${index})">Delete</button>
@@ -2536,23 +2688,23 @@
                     tbody.appendChild(row);
                 });
             },
-            
+
             // Update prospects table
             updateProspectsTable: function() {
                 const tbody = document.getElementById('prospectsTableBody');
                 tbody.innerHTML = '';
-                
+
                 const userData = this.getUserData();
-                
+
                 userData.prospects.forEach((prospect, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${prospect.phone}</td>
-                        <td>${prospect.name}</td>
+                        <td>${prospect.phone || '-'}</td>
+                        <td>${prospect.name || '-'}</td>
                         <td>${prospect.business || '-'}</td>
-                        <td>${prospect.location}</td>
-                        <td>${prospect.interestLevel}</td>
-                        <td><span class="status-badge">${prospect.status}</span></td>
+                        <td>${prospect.location || '-'}</td>
+                        <td>${prospect.interestLevel || '-'}</td>
+                        <td><span class="status-badge">${prospect.status || '-'}</span></td>
                         <td>${prospect.followUpDate || 'No follow-up'}</td>
                         <td>
                             <button class="btn btn-sm btn-outline" onclick="app.editProspect('${prospect.cluster}', ${index})">Edit</button>
@@ -2562,24 +2714,24 @@
                     tbody.appendChild(row);
                 });
             },
-            
+
             // Update recruitment table
             updateRecruitmentTable: function() {
                 const tbody = document.getElementById('recruitmentTableBody');
                 tbody.innerHTML = '';
-                
+
                 const userData = this.getUserData();
-                
+
                 userData.recruitment.forEach((recruitment, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${recruitment.phone}</td>
-                        <td>${recruitment.name}</td>
+                        <td>${recruitment.phone || '-'}</td>
+                        <td>${recruitment.name || '-'}</td>
                         <td>${recruitment.business || '-'}</td>
-                        <td>${recruitment.location}</td>
-                        <td><span class="status-badge">${recruitment.status}</span></td>
+                        <td>${recruitment.location || '-'}</td>
+                        <td><span class="status-badge">${recruitment.status || '-'}</span></td>
                         <td>${recruitment.recruitmentDate || '-'}</td>
-                        <td>${recruitment.addedBy}</td>
+                        <td>${recruitment.addedBy || '-'}</td>
                         <td>
                             <button class="btn btn-sm btn-outline" onclick="app.editRecruitment('${recruitment.cluster}', ${index})">Edit</button>
                             <button class="btn btn-sm btn-secondary" onclick="app.deleteRecruitment('${recruitment.cluster}', ${index})">Delete</button>
@@ -2588,24 +2740,24 @@
                     tbody.appendChild(row);
                 });
             },
-            
+
             // Update servicing table
             updateServicingTable: function() {
                 const tbody = document.getElementById('servicingTableBody');
                 tbody.innerHTML = '';
-                
+
                 const userData = this.getUserData();
-                
+
                 userData.servicing.forEach((servicing, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${servicing.retailer}</td>
-                        <td>${servicing.serviceType}</td>
+                        <td>${servicing.retailer || '-'}</td>
+                        <td>${servicing.serviceType || '-'}</td>
                         <td>${servicing.amount ? 'KES ' + servicing.amount : '-'}</td>
-                        <td>${servicing.serviceDate}</td>
-                        <td><span class="status-badge">${servicing.status}</span></td>
+                        <td>${servicing.serviceDate || '-'}</td>
+                        <td><span class="status-badge">${servicing.status || '-'}</span></td>
                         <td>${servicing.description || '-'}</td>
-                        <td>${servicing.addedBy}</td>
+                        <td>${servicing.addedBy || '-'}</td>
                         <td>
                             <button class="btn btn-sm btn-outline" onclick="app.editServicing('${servicing.cluster}', ${index})">Edit</button>
                             <button class="btn btn-sm btn-secondary" onclick="app.deleteServicing('${servicing.cluster}', ${index})">Delete</button>
@@ -2614,22 +2766,22 @@
                     tbody.appendChild(row);
                 });
             },
-            
+
             // Populate retailer dropdown for servicing form
             populateRetailerDropdown: function() {
                 const select = document.getElementById('servicingRetailer');
                 select.innerHTML = '<option value="">Select Retailer</option>';
-                
+
                 const userData = this.getUserData();
-                
+
                 userData.retailers.forEach(retailer => {
                     const option = document.createElement('option');
-                    option.value = `${retailer.firstName} ${retailer.lastName} - ${retailer.businessName || 'No Business Name'}`;
-                    option.textContent = `${retailer.firstName} ${retailer.lastName} - ${retailer.businessName || 'No Business Name'}`;
+                    option.value = `${retailer.firstName || ''} ${retailer.lastName || ''} - ${retailer.businessName || 'No Business Name'}`;
+                    option.textContent = `${retailer.firstName || ''} ${retailer.lastName || ''} - ${retailer.businessName || 'No Business Name'}`;
                     select.appendChild(option);
                 });
             },
-            
+
             // Update dashboard statistics
             updateDashboardStats: function() {
                 const userData = this.getUserData();
@@ -2663,23 +2815,23 @@
                 const allActivities = [
                     ...userData.retailers.map(r => ({
                         type: 'retailer',
-                        text: `Added retailer: ${r.firstName} ${r.lastName}`,
-                        time: new Date(r.addedDate)
+                        text: `Added retailer: ${r.firstName || ''} ${r.lastName || ''}`,
+                        time: new Date(r.addedDate || new Date())
                     })),
                     ...userData.prospects.map(p => ({
                         type: 'prospect',
-                        text: `Added prospect: ${p.name}`,
-                        time: new Date(p.addedDate)
+                        text: `Added prospect: ${p.name || '-'}`,
+                        time: new Date(p.addedDate || new Date())
                     })),
                     ...userData.recruitment.map(r => ({
                         type: 'recruitment',
-                        text: `Updated recruitment: ${r.name} - ${r.status}`,
-                        time: new Date(r.addedDate)
+                        text: `Updated recruitment: ${r.name || '-'} - ${r.status || '-'}`,
+                        time: new Date(r.addedDate || new Date())
                     })),
                     ...userData.servicing.map(s => ({
                         type: 'servicing',
-                        text: `Added servicing: ${s.serviceType} for ${s.retailer}`,
-                        time: new Date(s.addedDate)
+                        text: `Added servicing: ${s.serviceType || '-'} for ${s.retailer || '-'}`,
+                        time: new Date(s.addedDate || new Date())
                     }))
                 ];
                 
@@ -2810,20 +2962,21 @@
                 const clusters = ['KASARANI', 'MWIKI', 'ZIMMERMAN', 'GITHURAI', 'RUAI'];
                 const agents = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams', 'David Brown'];
                 
+                // if viewCluster is set, bias the results to that cluster
+                const topClusters = clusters.map(cluster => ({
+                    name: cluster,
+                    value: Math.floor(Math.random() * 50) + 20
+                })).sort((a, b) => b.value - a.value).slice(0, 3);
+
                 return {
-                    topClusters: clusters.map(cluster => ({
-                        name: cluster,
-                        value: Math.floor(Math.random() * 50) + 20
-                    })).sort((a, b) => b.value - a.value).slice(0, 3),
-                    
+                    topClusters,
                     topAgents: agents.map(agent => ({
                         name: agent,
                         conversions: Math.floor(Math.random() * 30) + 10
                     })).sort((a, b) => b.conversions - a.conversions).slice(0, 3),
-                    
                     totalRetailers: this.masterData.retailers.length,
                     activeProspects: this.masterData.prospects.filter(p => p.status !== 'Converted').length,
-                    conversionRate: Math.floor((this.masterData.retailers.length / (this.masterData.prospects.length + this.masterData.retailers.length)) * 100)
+                    conversionRate: Math.floor((this.masterData.retailers.length / (this.masterData.prospects.length + this.masterData.retailers.length || 1)) * 100)
                 };
             },
             
@@ -3016,94 +3169,102 @@
             // Delete functions
             deleteRetailer: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this retailer?')) {
-                    // Find the actual index in master data
-                    const masterIndex = this.masterData.retailers.findIndex(item => 
-                        item.cluster === cluster && 
-                        this.getUserData().retailers[index].msisdn === item.msisdn
-                    );
-                    
+                    // Find the actual index in master data by matching unique fields (msisdn)
+                    const filtered = this.getUserData().retailers;
+                    const item = filtered[index];
+                    if (!item) return;
+                    const masterIndex = this.masterData.retailers.findIndex(m => m.msisdn === item.msisdn && m.cluster === item.cluster);
+
                     if (masterIndex !== -1) {
                         this.masterData.retailers.splice(masterIndex, 1);
+                        this.saveMasterData();
                         this.updateRetailersTable();
                         this.updateDashboardStats();
                         this.populateRetailerDropdown();
+                        this.populateClustersList();
                         this.showToast('Retailer deleted successfully', 'success');
                     }
                 }
             },
-            
+
             deleteProspect: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this prospect?')) {
-                    // Find the actual index in master data
-                    const masterIndex = this.masterData.prospects.findIndex(item => 
-                        item.cluster === cluster && 
-                        this.getUserData().prospects[index].phone === item.phone
-                    );
-                    
+                    const filtered = this.getUserData().prospects;
+                    const item = filtered[index];
+                    if (!item) return;
+                    const masterIndex = this.masterData.prospects.findIndex(m => m.phone === item.phone && m.cluster === item.cluster);
+
                     if (masterIndex !== -1) {
                         this.masterData.prospects.splice(masterIndex, 1);
+                        this.saveMasterData();
                         this.updateProspectsTable();
                         this.updateDashboardStats();
+                        this.populateClustersList();
                         this.showToast('Prospect deleted successfully', 'success');
                     }
                 }
             },
-            
+
             deleteRecruitment: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this recruitment record?')) {
-                    // Find the actual index in master data
-                    const masterIndex = this.masterData.recruitment.findIndex(item => 
-                        item.cluster === cluster && 
-                        this.getUserData().recruitment[index].phone === item.phone
-                    );
-                    
+                    const filtered = this.getUserData().recruitment;
+                    const item = filtered[index];
+                    if (!item) return;
+                    const masterIndex = this.masterData.recruitment.findIndex(m => m.phone === item.phone && m.cluster === item.cluster);
+
                     if (masterIndex !== -1) {
                         this.masterData.recruitment.splice(masterIndex, 1);
+                        this.saveMasterData();
                         this.updateRecruitmentTable();
                         this.updateDashboardStats();
+                        this.populateClustersList();
                         this.showToast('Recruitment record deleted successfully', 'success');
                     }
                 }
             },
-            
+
             deleteServicing: function(cluster, index) {
                 if (confirm('Are you sure you want to delete this servicing record?')) {
-                    // Find the actual index in master data
-                    const masterIndex = this.masterData.servicing.findIndex(item => 
-                        item.cluster === cluster && 
-                        this.getUserData().servicing[index].retailer === item.retailer &&
-                        this.getUserData().servicing[index].serviceDate === item.serviceDate
+                    const filtered = this.getUserData().servicing;
+                    const item = filtered[index];
+                    if (!item) return;
+                    const masterIndex = this.masterData.servicing.findIndex(m =>
+                        m.retailer === item.retailer &&
+                        m.serviceDate === item.serviceDate &&
+                        m.cluster === item.cluster
                     );
-                    
+
                     if (masterIndex !== -1) {
                         this.masterData.servicing.splice(masterIndex, 1);
+                        this.saveMasterData();
                         this.updateServicingTable();
                         this.updateDashboardStats();
+                        this.populateClustersList();
                         this.showToast('Servicing record deleted successfully', 'success');
                     }
                 }
             },
-            
+
             // Show toast notification
             showToast: function(message, type = 'info') {
                 const toastContainer = document.getElementById('toastContainer');
                 const toast = document.createElement('div');
                 toast.className = `toast ${type}`;
-                
+
                 const icons = {
                     success: '✅',
                     error: '❌',
                     warning: '⚠️',
                     info: 'ℹ️'
                 };
-                
+
                 toast.innerHTML = `
                     <span class="toast-icon">${icons[type]}</span>
                     <span class="toast-message">${message}</span>
                 `;
-                
+
                 toastContainer.appendChild(toast);
-                
+
                 // Remove toast after 5 seconds
                 setTimeout(() => {
                     toast.remove();
